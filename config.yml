@@ -8,5 +8,6 @@ pipeline:
     active: false
 
 policies:
-  - name: FlowPolicy
+- name: FlowPolicy
 #  - name: EnterpriseSearchPolicy
+assistant_id: 20250212-112131-brown-rotation
