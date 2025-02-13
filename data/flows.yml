@@ -1,0 +1,6 @@
+flows:
+  ask_question:
+    description: Help users get class doubts explained.
+    steps:
+      - collect: user_query
+      - action: action_fetch_class_material
