@@ -22,3 +22,8 @@ flows:
           - else: transfer_successful
       - action: utter_transfer_complete
         id: transfer_successful
+
+  ask_question:
+    steps:
+      - collect: user_query
+      - action: action_fetch_class_material

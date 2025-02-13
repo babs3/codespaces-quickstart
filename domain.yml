@@ -2,16 +2,17 @@ version: "3.1"
 
 actions:
   - action_check_sufficient_funds
+  - action_fetch_class_material
 
 slots:
   recipient:
     type: text
     mappings:
-      - type: from_llm
+      - type: from_text   
   amount:
     type: float
     mappings:
-      - type: from_llm
+      - type: from_text   
   has_sufficient_funds:
     type: bool
     mappings:
@@ -19,7 +20,11 @@ slots:
   final_confirmation:
     type: bool
     mappings:
-      - type: from_llm
+      - type: from_text   
+  user_query:
+    type: text
+    mappings:
+      - type: custom
 
 responses:
   utter_ask_recipient:
