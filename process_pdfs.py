@@ -1,15 +1,17 @@
 import os
 import fitz  # PyMuPDF
-import faiss
-import numpy as np
-import pickle
+import sys
+sys.modules["sqlite3"] = __import__("pysqlite3")
+import chromadb
 from sentence_transformers import SentenceTransformer
 
 # Configuration
 PDF_FOLDER = "materials/pdfs"
-INDEX_PATH = "vector_store/faiss_index"
-DATA_PATH = "vector_store/documents.pkl"
 CHUNK_SIZE = 80  # Adjust the chunk size to control granularity
+
+# Initialize ChromaDB client
+chroma_client = chromadb.PersistentClient(path="vector_store/chroma_db")
+collection = chroma_client.get_or_create_collection(name="class_materials")
 
 # Load sentence transformer model
 model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -33,20 +35,15 @@ for file in os.listdir(PDF_FOLDER):
     if file.endswith(".pdf"):
         pdf_path = os.path.join(PDF_FOLDER, file)
         text_chunks = extract_text_chunks(pdf_path)
-        documents.extend(text_chunks)
-        metadata.extend([{"file": file, "chunk_id": i} for i in range(len(text_chunks))])
+        
+        for i, chunk in enumerate(text_chunks):
+            doc_id = f"{file}_{i}"  # Unique ID for each chunk
+            embedding = model.encode(chunk).tolist()
+            
+            collection.add(
+                ids=[doc_id],
+                embeddings=[embedding],
+                metadatas=[{"file": file, "chunk_id": i, "text": chunk}]
+            )
 
-# Generate embeddings
-embeddings = model.encode(documents, convert_to_numpy=True)
-
-# Save document chunks and metadata
-with open(DATA_PATH, "wb") as f:
-    pickle.dump((documents, metadata), f)
-
-# Build FAISS index
-dimension = embeddings.shape[1]
-index = faiss.IndexFlatL2(dimension)
-index.add(embeddings)
-faiss.write_index(index, INDEX_PATH)
-
-print("Knowledge base has been created with chunked documents.")
+print("Knowledge base has been created with ChromaDB.")

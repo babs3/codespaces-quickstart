@@ -5,86 +5,77 @@
 # https://rasa.com/docs/rasa-pro/concepts/custom-actions
 
 
-# This is a simple example for a custom action which utters "Hello World!"
-
-# from typing import Any, Text, Dict, List
-#
-# from rasa_sdk import Action, Tracker
-# from rasa_sdk.executor import CollectingDispatcher
-#
-#
-# class ActionHelloWorld(Action):
-#
-#     def name(self) -> Text:
-#         return "action_hello_world"
-#
-#     def run(self, dispatcher: CollectingDispatcher,
-#             tracker: Tracker,
-#             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-#
-#         dispatcher.utter_message(text="Hello World!")
-#
-#         return []
-
-"""
+import os
+import sys
+sys.modules["sqlite3"] = __import__("pysqlite3")
+import chromadb
+import numpy as np
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
-#from rasa_sdk.events import SlotSet
-from typing import Any, Text, Dict, List
+from sentence_transformers import SentenceTransformer
+import google.generativeai as genai
 
-from materials.auxiliar import *
+# Initialize ChromaDB client
+chroma_client = chromadb.PersistentClient(path="vector_store/chroma_db")
+collection = chroma_client.get_collection(name="class_materials")
+
+# Load the embedding model
+model = SentenceTransformer("all-MiniLM-L6-v2")
+
+# Set up Google Gemini API Key
+genai.configure(api_key=os.getenv("GENAI_API_KEY"))
 
 class ActionFetchClassMaterial(Action):
     def name(self):
         return "action_fetch_class_material"
 
-    def run(
-        self,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: Dict[Text, Any],
-    ) -> List[Dict[Text, Any]]:
+    def run(self, dispatcher, tracker, domain):
+        query = tracker.latest_message.get("text")  # Get user query
+        query_embedding = model.encode(query).tolist()
 
-        user_query = tracker.get_slot("user_query")
-        relevant_info = search_text(user_query)  # Call vector search function
-        dispatcher.utter_message(f"Here's some information from class materials:\n\n{relevant_info}")
+        # Retrieve top 3 results from ChromaDB
+        results = collection.query(
+            query_embeddings=[query_embedding],
+            n_results=3  # Retrieve top 3 chunks
+        )
 
-        #materials = "Here are your class materials: [link]"
-        #dispatcher.utter_message(text=materials)
+        retrieved_texts = []
+        file_names = set()
+
+        if results["ids"]:
+            for i in range(len(results["ids"][0])):
+                file_name = results["metadatas"][0][i]["file"]
+                chunk_text = results["metadatas"][0][i]["text"]
+                file_names.add(file_name)
+                retrieved_texts.append(f"From {file_name}:\n{chunk_text}")
+
+            raw_text = "\n".join(retrieved_texts)
+            file_names_str = ", ".join(file_names)  # List of PDFs used
+
+            prompt = f"Summarize this educational content and make it more readable for students. The content comes from: {file_names_str}.\n\n{raw_text}\n\nIn the end of your response, please refer the pdfs where the relevant info came from."
+
+            try:
+                # Call Gemini API
+                g_model = genai.GenerativeModel("gemini-pro")
+                response = g_model.generate_content(prompt)
+
+                # Extract response text correctly
+                if hasattr(response, "text") and response.text:
+                    dispatcher.utter_message(text=response.text)
+                else:
+                    dispatcher.utter_message(text="Sorry, I couldn't generate a response.")
+
+            except Exception as e:
+                dispatcher.utter_message(text="Sorry, I couldn't process that request.")
+                print(f"Error: {e}")
+        else:
+            dispatcher.utter_message(text="I couldn't find relevant class materials for your query.")
+
         return []
-"""
 
 
-import os
-import faiss
-import pickle
-import numpy as np
-from rasa_sdk import Action
-from rasa_sdk.events import SlotSet
-from sentence_transformers import SentenceTransformer
 
-# Load the same model used for indexing
-model = SentenceTransformer("all-MiniLM-L6-v2")
-
-# Load FAISS index and document store
-INDEX_PATH = "vector_store/faiss_index"
-DATA_PATH = "vector_store/documents.pkl"
-
-index = faiss.read_index(INDEX_PATH)
-
-with open(DATA_PATH, "rb") as f:
-    documents, metadata = pickle.load(f)
-
-
-import google.generativeai as genai
-from rasa_sdk import Action, Tracker
-from rasa_sdk.executor import CollectingDispatcher
-import os
-
-# Set up Google Gemini API Key
-GENAI_API_KEY = "AIzaSyCFVTmc30L2AZ76WaEC3VWrrsMGwbKDYpM"
-genai.configure(api_key=GENAI_API_KEY)
-
+""" not used for now """
 class ActionGenerateAnswer(Action): # only using gemini
     def name(self):
         return "action_generate_answer"
@@ -104,58 +95,6 @@ class ActionGenerateAnswer(Action): # only using gemini
             dispatcher.utter_message(text="Sorry, I couldn't process that request.")
             print(f"Error: {e}")
 
-        return []
-
-
-
-class ActionFetchClassMaterial(Action):
-    def name(self):
-        return "action_fetch_class_material"
-
-    def run(self, dispatcher, tracker, domain):
-        query = tracker.latest_message.get("text")  # Get user query
-        query_embedding = model.encode([query], convert_to_numpy=True)
-
-        # Search in FAISS index
-        _, indices = index.search(query_embedding, k=3)  # Retrieve top 3 chunks
-
-        raw_results = []
-        results = []
-
-        for idx in indices[0]:
-            file_name = metadata[idx]["file"]
-            chunk_id = metadata[idx]["chunk_id"]
-            text_chunk = documents[idx]
-            raw_results.append(f"📄 **{file_name}** (Part {chunk_id+1}):\n{text_chunk}...")  
-            results.append(f"From {file_name}:\n{text_chunk}")
-
-        if results:
-            raw_text = "\n".join(results)
-            prompt = f"Summarize this educational content and make it more readable for students; please mantain the reference \"From {file_name}\" before show the respective content to be easy for the students to know the pdfs from where the content come from. Here's the educational content: \n{raw_text}."
-            
-            try:
-                # Call Gemini API
-                g_model = genai.GenerativeModel("gemini-pro")
-                response = g_model.generate_content(prompt)
-
-                # Send Gemini's response back to user
-                #dispatcher.utter_message(text=response.text)
-                
-                # ✅ Extract response text correctly
-                if hasattr(response, "text") and response.text:
-                    dispatcher.utter_message(text=response.text)
-                else:
-                    dispatcher.utter_message(text="Sorry, I couldn't generate a response.")
-
-
-            except Exception as e:
-                dispatcher.utter_message(text="Sorry, I couldn't process that request.")
-                print(f"Error: {e}")
-        else:
-            response = "I couldn't find relevant class materials for your query."
-
-        response = "Here are the most relevant excerpts from class materials:\n\n" + "\n\n".join(raw_results)
-        dispatcher.utter_message(text=response)
         return []
 
 
