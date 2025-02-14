@@ -9,7 +9,7 @@ from sentence_transformers import SentenceTransformer
 PDF_FOLDER = "materials/pdfs"
 INDEX_PATH = "vector_store/faiss_index"
 DATA_PATH = "vector_store/documents.pkl"
-CHUNK_SIZE = 300  # Adjust the chunk size to control granularity
+CHUNK_SIZE = 80  # Adjust the chunk size to control granularity
 
 # Load sentence transformer model
 model = SentenceTransformer("all-MiniLM-L6-v2")

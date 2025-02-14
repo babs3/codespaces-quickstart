@@ -119,18 +119,19 @@ class ActionFetchClassMaterial(Action):
         # Search in FAISS index
         _, indices = index.search(query_embedding, k=3)  # Retrieve top 3 chunks
 
+        raw_results = []
         results = []
+
         for idx in indices[0]:
             file_name = metadata[idx]["file"]
-            #chunk_id = metadata[idx]["chunk_id"]
+            chunk_id = metadata[idx]["chunk_id"]
             text_chunk = documents[idx]
-            #results.append(f"📄 **{file_name}** (Part {chunk_id+1}):\n{text_chunk}...")  
+            raw_results.append(f"📄 **{file_name}** (Part {chunk_id+1}):\n{text_chunk}...")  
             results.append(f"From {file_name}:\n{text_chunk}")
 
         if results:
-            #response = "Here are the most relevant excerpts from class materials:\n\n" + "\n\n".join(results)
             raw_text = "\n".join(results)
-            prompt = f"Summarize this educational content and make it more readable for students:\n{raw_text}"
+            prompt = f"Summarize this educational content and make it more readable for students; please mantain the reference \"From {file_name}\" before show the respective content to be easy for the students to know the pdfs from where the content come from. Here's the educational content: \n{raw_text}."
             
             try:
                 # Call Gemini API
@@ -153,7 +154,8 @@ class ActionFetchClassMaterial(Action):
         else:
             response = "I couldn't find relevant class materials for your query."
 
-        #dispatcher.utter_message(text=response)
+        response = "Here are the most relevant excerpts from class materials:\n\n" + "\n\n".join(raw_results)
+        dispatcher.utter_message(text=response)
         return []
 
 
