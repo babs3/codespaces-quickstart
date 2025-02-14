@@ -75,8 +75,37 @@ index = faiss.read_index(INDEX_PATH)
 with open(DATA_PATH, "rb") as f:
     documents, metadata = pickle.load(f)
 
-    print("Metadata Type:", type(metadata))  # Should be a list
-    print("Metadata Example:", metadata[0])  # Should be a dictionary with "file" and "chunk_id"
+
+import google.generativeai as genai
+from rasa_sdk import Action, Tracker
+from rasa_sdk.executor import CollectingDispatcher
+import os
+
+# Set up Google Gemini API Key
+GENAI_API_KEY = "AIzaSyCFVTmc30L2AZ76WaEC3VWrrsMGwbKDYpM"
+genai.configure(api_key=GENAI_API_KEY)
+
+class ActionGenerateAnswer(Action): # only using gemini
+    def name(self):
+        return "action_generate_answer"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: dict):
+        user_query = tracker.latest_message.get("text")
+
+        try:
+            # Call Gemini API
+            g_model = genai.GenerativeModel("gemini-pro")
+            response = g_model.generate_content(user_query)
+
+            # Send Gemini's response back to user
+            dispatcher.utter_message(text=response.text)
+
+        except Exception as e:
+            dispatcher.utter_message(text="Sorry, I couldn't process that request.")
+            print(f"Error: {e}")
+
+        return []
+
 
 
 class ActionFetchClassMaterial(Action):
@@ -93,16 +122,38 @@ class ActionFetchClassMaterial(Action):
         results = []
         for idx in indices[0]:
             file_name = metadata[idx]["file"]
-            chunk_id = metadata[idx]["chunk_id"]
+            #chunk_id = metadata[idx]["chunk_id"]
             text_chunk = documents[idx]
-            results.append(f"📄 **{file_name}** (Part {chunk_id+1}):\n{text_chunk}...")  
+            #results.append(f"📄 **{file_name}** (Part {chunk_id+1}):\n{text_chunk}...")  
+            results.append(f"From {file_name}:\n{text_chunk}")
 
         if results:
-            response = "Here are the most relevant excerpts from class materials:\n\n" + "\n\n".join(results)
+            #response = "Here are the most relevant excerpts from class materials:\n\n" + "\n\n".join(results)
+            raw_text = "\n".join(results)
+            prompt = f"Summarize this educational content and make it more readable for students:\n{raw_text}"
+            
+            try:
+                # Call Gemini API
+                g_model = genai.GenerativeModel("gemini-pro")
+                response = g_model.generate_content(prompt)
+
+                # Send Gemini's response back to user
+                #dispatcher.utter_message(text=response.text)
+                
+                # ✅ Extract response text correctly
+                if hasattr(response, "text") and response.text:
+                    dispatcher.utter_message(text=response.text)
+                else:
+                    dispatcher.utter_message(text="Sorry, I couldn't generate a response.")
+
+
+            except Exception as e:
+                dispatcher.utter_message(text="Sorry, I couldn't process that request.")
+                print(f"Error: {e}")
         else:
             response = "I couldn't find relevant class materials for your query."
 
-        dispatcher.utter_message(text=response)
+        #dispatcher.utter_message(text=response)
         return []
 
 
@@ -125,32 +176,3 @@ class ActionAskMistral(Action):
         return []
 
 
-import google.generativeai as genai
-from rasa_sdk import Action, Tracker
-from rasa_sdk.executor import CollectingDispatcher
-import os
-
-# Set up Google Gemini API Key
-GENAI_API_KEY = "AIzaSyCFVTmc30L2AZ76WaEC3VWrrsMGwbKDYpM"
-genai.configure(api_key=GENAI_API_KEY)
-
-class ActionGenerateAnswer(Action):
-    def name(self):
-        return "action_generate_answer"
-
-    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: dict):
-        user_query = tracker.latest_message.get("text")
-
-        try:
-            # Call Gemini API
-            model = genai.GenerativeModel("gemini-pro")
-            response = model.generate_content(user_query)
-
-            # Send Gemini's response back to user
-            dispatcher.utter_message(text=response.text)
-
-        except Exception as e:
-            dispatcher.utter_message(text="Sorry, I couldn't process that request.")
-            print(f"Error: {e}")
-
-        return []

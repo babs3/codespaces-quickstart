@@ -32,4 +32,4 @@ stories:
 - story: user requests class material
   steps:
     - intent: request_class_material
-    - action: action_generate_answer
+    - action: action_fetch_class_material
