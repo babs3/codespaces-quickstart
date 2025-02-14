@@ -29,8 +29,7 @@ stories:
   - intent: deny
   - action: utter_goodbye
 
-
-- story: User asks for materials
+- story: user requests class material
   steps:
-  - intent: ask_materials
-  - action: action_fetch_class_material
+    - intent: request_class_material
+    - action: action_generate_answer
