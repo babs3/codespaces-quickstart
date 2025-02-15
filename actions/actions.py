@@ -83,8 +83,8 @@ class ActionFetchClassMaterial(Action):
         if results_text:
             # Prepare final text for Gemini
             raw_text = "\n".join(results_text)
-            prompt = f"Summarize this educational content and make it more readable for students. Keep the PDF name and page numbers clear: \n{raw_text}."
-
+            #prompt = f"Summarize this educational content and make it more readable for students. Keep the PDF name and page numbers clear: \n{raw_text}."
+            prompt = f"Use the following raw educational content to answer the student query: '{query}'. Make the provided content more readable to the student and don't forget to mention the PDF name and page numbers where the student could find more information: \n{raw_text} "
             print("\n📢 Sending to Gemini API for Summarization...")
             print(f"🔹 Prompt: {prompt[:300]}...")  # Show only first 300 chars for readability
 
