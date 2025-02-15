@@ -1,49 +1,57 @@
-import os
-import fitz  # PyMuPDF
 import sys
 sys.modules["sqlite3"] = __import__("pysqlite3")
+import os
+import fitz  # PyMuPDF
 import chromadb
+import numpy as np
 from sentence_transformers import SentenceTransformer
 
 # Configuration
 PDF_FOLDER = "materials/pdfs"
-CHUNK_SIZE = 80  # Adjust the chunk size to control granularity
+VECTOR_DB_PATH = "vector_store"  # Path for storing the vector database
 
 # Initialize ChromaDB client
-chroma_client = chromadb.PersistentClient(path="vector_store/chroma_db")
+chroma_client = chromadb.PersistentClient(path=VECTOR_DB_PATH)
 collection = chroma_client.get_or_create_collection(name="class_materials")
 
 # Load sentence transformer model
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
-# Function to extract and split text from PDF
-def extract_text_chunks(pdf_path, chunk_size=CHUNK_SIZE):
+def extract_text_by_page(pdf_path):
+    """Extracts text from each page of a PDF separately."""
     doc = fitz.open(pdf_path)
-    full_text = " ".join([page.get_text("text") for page in doc])
+    page_chunks = []
 
-    # Split text into chunks of CHUNK_SIZE words
-    words = full_text.split()
-    chunks = [" ".join(words[i:i + chunk_size]) for i in range(0, len(words), chunk_size)]
+    for page_num in range(len(doc)):
+        text = doc[page_num].get_text("text").strip()
+        if text:  # Ensure non-empty text
+            page_chunks.append({"text": text, "page": page_num + 1})
     
-    return chunks
+    return page_chunks
 
-# Process all PDFs and create document chunks
+# Process all PDFs
 documents = []
 metadata = []
 
 for file in os.listdir(PDF_FOLDER):
     if file.endswith(".pdf"):
         pdf_path = os.path.join(PDF_FOLDER, file)
-        text_chunks = extract_text_chunks(pdf_path)
-        
-        for i, chunk in enumerate(text_chunks):
-            doc_id = f"{file}_{i}"  # Unique ID for each chunk
-            embedding = model.encode(chunk).tolist()
-            
-            collection.add(
-                ids=[doc_id],
-                embeddings=[embedding],
-                metadatas=[{"file": file, "chunk_id": i, "text": chunk}]
-            )
+        page_chunks = extract_text_by_page(pdf_path)
 
-print("Knowledge base has been created with ChromaDB.")
+        for chunk in page_chunks:
+            documents.append(chunk["text"])
+            metadata.append({"file": file, "page": chunk["page"]})
+
+# Generate embeddings
+embeddings = model.encode(documents, convert_to_numpy=True)
+
+# Store in ChromaDB
+for i, doc_text in enumerate(documents):
+    collection.add(
+        ids=[str(i)],
+        embeddings=[embeddings[i].tolist()],
+        metadatas=[metadata[i]],
+        documents=[doc_text]
+    )
+
+print("Knowledge base has been created with page-based document storage.")
