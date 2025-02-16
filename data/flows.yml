@@ -4,3 +4,25 @@ flows:
     steps:
       - collect: user_query
       - action: action_fetch_class_material
+      - collect: more_questions
+        next:
+        - if: not slots.more_questions
+          then:
+            - action: utter_goodbye
+              next: END
+        - else: 
+            - link: ask_another_question  
+
+  ask_another_question:
+    description: Allow users to ask follow-up questions.
+    steps:
+      - collect: user_query
+      - action: action_fetch_class_material
+      - collect: more_questions
+        next:
+        - if: not slots.more_questions
+          then:
+            - action: utter_goodbye
+              next: END
+        - else: 
+            - link: ask_another_question 

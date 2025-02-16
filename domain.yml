@@ -10,10 +10,15 @@ intents:
   - bot_challenge
   - ask_materials
   - request_class_material
+  - ask_another_question
 
 slots:
   user_query:
     type: text
+    mappings:
+      - type: from_llm
+  more_questions:
+    type: bool
     mappings:
       - type: from_llm
 
@@ -32,7 +37,7 @@ responses:
   - text: "Great, carry on!"
 
   utter_goodbye:
-  - text: "Bye"
+  - text: "Goodbye! Have a great day!"
 
   utter_iamabot:
   - text: "I am a bot, powered by Rasa."
@@ -42,6 +47,9 @@ responses:
   
   utter_ask_class_material:
     - text: "What topic do you need class materials for?"
+  
+  utter_ask_more_questions:
+  - text: "Do you have any more questions?"
 
 actions:
   - action_fetch_class_material
