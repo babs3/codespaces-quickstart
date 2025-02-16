@@ -1,12 +1,24 @@
 flows:
   pattern_chitchat:
-    description: Handle casual off-topic questions while keeping focus.
+    description: Handle small talk and casual conversations while keeping the focus.
     name: pattern chitchat
     steps:
       - action: utter_free_chitchat_response
 
   pattern_search:
-    description: Handle knowledge-based follow-up questions properly.
-    name: pattern search
+    description: Handle general knowledge questions that are relevant to learning.
+    name: pattern general knowledge
     steps:
-      - action: utter_ask_more_questions
+      - action: action_answer_general_question
+
+  pattern_class_materials:
+    description: Redirect users asking about class materials.
+    name: pattern class materials
+    steps:
+      - action: action_fetch_class_material
+
+  pattern_forbidden_topics:
+    description: Handle and reject questions that are not allowed.
+    name: pattern forbidden topics
+    steps:
+      - action: utter_restricted_topic_warning

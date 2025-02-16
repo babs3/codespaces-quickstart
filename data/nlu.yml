@@ -90,6 +90,15 @@ nlu:
     - am I talking to a bot?
     - am I talking to a human?
 
+- intent: ask_forbidden_topics
+  examples: |
+    - How do I hack a system?
+    - How can I cheat on an exam?
+    - Can you tell me how to break into a database?
+    - How to bypass security measures?
+    - How to hack into a Wi-Fi network?
+    - Can you teach me illegal activities?
+
 
 - intent: ask_question
   examples: |

@@ -10,6 +10,7 @@ intents:
   - bot_challenge
   - ask_question
   - ask_another_question
+  - ask_forbidden_topics
 
 slots:
   user_query:
@@ -47,8 +48,18 @@ responses:
   utter_ask_more_questions:
   - text: "Do you have any more questions?"
 
+  utter_restricted_topic_warning:
+  - text: "I'm sorry, but I can't provide information on that topic."
+
+  utter_free_chitchat_response:
+  - text: "I'm here to help with class materials and learning support. Let me know what you need!"
+  - text: "I specialize in assisting with course-related questions. Do you need help with something specific?"
+  - text: "Let's keep the focus on learning. What topic do you need assistance with?"
+  - text: "I'm here to assist with your learning! How can I help?"
+
 actions:
   - action_fetch_class_material
+  - action_answer_general_question
 
 session_config:
   session_expiration_time: 60

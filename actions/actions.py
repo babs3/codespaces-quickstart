@@ -109,3 +109,26 @@ class ActionFetchClassMaterial(Action):
 
         return []
 
+
+class ActionAnswerGeneralQuestion(Action):
+    def name(self):
+        return "action_answer_general_question"
+
+    def run(self, dispatcher, tracker, domain):
+        query = tracker.latest_message.get("text")  # Get user query
+
+        try:
+            # Call Gemini API
+            g_model = genai.GenerativeModel("gemini-pro")
+            response = g_model.generate_content(f"Answer this educational question: {query}")
+
+            if hasattr(response, "text") and response.text:
+                dispatcher.utter_message(text=f"Here's what I found on the web about '{query}':\n\n"+response.text)
+            else:
+                dispatcher.utter_message(text="I'm not sure about that. Can you rephrase or ask something else?")
+        
+        except Exception as e:
+            dispatcher.utter_message(text="Sorry, I couldn't process your request.")
+            print(f"\n❌ Error calling Gemini API: {e}")
+
+        return []
