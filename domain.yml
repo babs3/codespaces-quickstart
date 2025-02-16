@@ -8,8 +8,7 @@ intents:
   - mood_great
   - mood_unhappy
   - bot_challenge
-  - ask_materials
-  - request_class_material
+  - ask_question
   - ask_another_question
 
 slots:
@@ -55,7 +54,6 @@ actions:
   - action_fetch_class_material
   - action_ask_mistral
   - action_generate_answer
-  - more_questions
 
 session_config:
   session_expiration_time: 60

@@ -9,4 +9,4 @@ flows:
     description: Handle knowledge-based follow-up questions properly.
     name: pattern search
     steps:
-      - action: more_questions
+      - action: utter_ask_more_questions

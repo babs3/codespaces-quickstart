@@ -90,9 +90,10 @@ nlu:
     - am I talking to a bot?
     - am I talking to a human?
 
-- intent: request_class_material
+
+- intent: ask_question
   examples: |
     - I need some lecture notes
-    - Can you provide study materials on calculus?
-    - I need help with linear algebra
-    - Do you have PDFs for physics topics?
+    - Can you provide study materials
+    - I need help
+    - Do you have PDFs available
