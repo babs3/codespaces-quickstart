@@ -29,9 +29,6 @@ responses:
   - text: "Here is something to cheer you up:"
     image: "https://i.imgur.com/nGF1K8f.jpg"
 
-  utter_did_that_help:
-  - text: "Did that help you?"
-
   utter_happy:
   - text: "Great, carry on!"
 
@@ -42,18 +39,16 @@ responses:
   - text: "I am a bot, powered by Rasa."
 
   utter_ask_user_query:
-    - text: "What do you want to know more about?"
-  
-  utter_ask_class_material:
-    - text: "What topic do you need class materials for?"
+  - text: "What do you want to know more about?"
+  - text: "How can I help you?"
+  - text: "What do you are strugling with?"
+  - text: "What topic do you need class materials for?"
   
   utter_ask_more_questions:
   - text: "Do you have any more questions?"
 
 actions:
   - action_fetch_class_material
-  - action_ask_mistral
-  - action_generate_answer
 
 session_config:
   session_expiration_time: 60

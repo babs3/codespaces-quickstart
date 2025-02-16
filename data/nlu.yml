@@ -94,6 +94,7 @@ nlu:
 - intent: ask_question
   examples: |
     - I need some lecture notes
-    - Can you provide study materials
+    - Provide me some study materials
     - I need help
-    - Do you have PDFs available
+    - I have some doubts
+    - I dont understand something
