@@ -1,8 +1,0 @@
-version: "3.1"
-
-stories:
-
-- story: user requests class material
-  steps:
-    - intent: request_class_material
-    - action: action_fetch_class_material
