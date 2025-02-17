@@ -7,7 +7,7 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 
 # Configuration
-PDF_FOLDER = "materials/pdfs"
+PDF_FOLDER = "materials/GEE_pdfs"
 VECTOR_DB_PATH = "vector_store"  # Path for storing the vector database
 
 # Initialize ChromaDB client

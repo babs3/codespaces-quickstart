@@ -32,9 +32,10 @@ class ActionFetchClassMaterial(Action):
 
     def run(self, dispatcher, tracker, domain):
         query = tracker.latest_message.get("text")  # Get user query
+        print(f"🧒 User query: {query}")
         query_embedding = model.encode(query, convert_to_numpy=True).tolist()  # ✅ Ensure it's 1D
 
-        # Search in ChromaDB - Get top 20 candidates
+        # Search in ChromaDB - Get top 10 candidates
         search_results = collection.query(
             query_embeddings=[query_embedding],
             n_results=10  # Retrieve more pages first
@@ -65,20 +66,22 @@ class ActionFetchClassMaterial(Action):
 
         # Ensure at least 1 result is returned
         if len(selected_results) == 0:
-            selected_results = [(documents[0], metadata[0], scores[0])]
+        #    selected_results = [(documents[0], metadata[0], scores[0])]
+            dispatcher.utter_message(text="I couldn't find relevant class materials for your query.")
+            print("\n🚨 No relevant materials found!")
+        else: 
+            print("\n✅ Selected Pages After Filtering:")
+            idx = 1
+            for doc, meta, score in selected_results:
+                print(f"{idx}. 📄 PDF: {meta['file']} | Page: {meta.get('page', 'unknown')} | Score: {score:.4f}")
+                idx += 1
 
-        print("\n✅ Selected Pages After Filtering:")
-        idx = 1
-        for doc, meta, score in selected_results:
-            print(f"{idx}. 📄 PDF: {meta['file']} | Page: {meta.get('page', 'unknown')} | Score: {score:.4f}")
-            idx += 1
-
-        # Format results
-        results_text = []
-        for text_chunk, meta, score in selected_results:
-            file_name = meta["file"]
-            page_number = meta["page"] if "page" in meta else "unknown"
-            results_text.append(f"📄 **From {file_name} (Page {page_number})**:\n{text_chunk}")
+            # Format results
+            results_text = []
+            for text_chunk, meta, score in selected_results:
+                file_name = meta["file"]
+                page_number = meta["page"] if "page" in meta else "unknown"
+                results_text.append(f"📄 **From {file_name} (Page {page_number})**:\n{text_chunk}")
 
         if results_text:
             # Prepare final text for Gemini
@@ -86,7 +89,7 @@ class ActionFetchClassMaterial(Action):
             #prompt = f"Summarize this educational content and make it more readable for students. Keep the PDF name and page numbers clear: \n{raw_text}."
             prompt = f"Use the following raw educational content to answer the student query: '{query}'. Make the provided content more readable to the student and don't forget to mention the PDF name and page numbers where the student could find more information: \n{raw_text} "
             print("\n📢 Sending to Gemini API for Summarization...")
-            print(f"🔹 Prompt: {prompt[:300]}...")  # Show only first 300 chars for readability
+            print(f"🔹 Prompt: {prompt[:500]}...")  # Show only first 500 chars for readability
 
             try:
                 # Call Gemini API
@@ -103,9 +106,6 @@ class ActionFetchClassMaterial(Action):
             except Exception as e:
                 dispatcher.utter_message(text="Sorry, I couldn't process that request.")
                 print(f"\n❌ Error calling Gemini API: {e}")
-        else:
-            dispatcher.utter_message(text="I couldn't find relevant class materials for your query.")
-            print("\n🚨 No relevant materials found!")
 
         return []
 
