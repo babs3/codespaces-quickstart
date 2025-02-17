@@ -16,3 +16,10 @@ flows:
             - action: utter_ok
               next: END
         - else: "start"
+  
+  greet:
+    description: Greet the user.
+    steps:
+      - action: utter_greet
+        next: END
+        

@@ -11,18 +11,8 @@ flows:
     steps:
       - action: action_answer_general_question
 
-  pattern_class_materials:
-    description: Redirect users asking about class materials.
-    name: pattern class materials
-    steps:
-      - action: action_fetch_class_material
-
-  pattern_forbidden_topics:
-    description: Handle and reject questions that are not allowed.
-    name: pattern forbidden topics
-    steps:
-      - action: utter_restricted_topic_warning
-
+      
+  # seems not to work...    
   pattern_session_start:
     description: Flow for starting the conversation
     name: pattern session start
