@@ -18,10 +18,6 @@ slots:
     type: text
     mappings:
       - type: from_llm
-  more_questions:
-    type: bool
-    mappings:
-      - type: from_llm
 
 responses:
   utter_chitchat/ask_name:
@@ -56,18 +52,6 @@ responses:
   utter_iamabot:
   - text: "I am a bot, powered by Rasa."
 
-  utter_ask_user_query:
-  - text: "What do you want to know more about?"
-  - text: "How can I help you?"
-  - text: "What do you are strugling with?"
-  - text: "What topic do you need class materials for?"
-  
-  utter_ask_more_questions:
-  - text: "Do you have any more questions?"
-
-  utter_restricted_topic_warning:
-  - text: "I'm sorry, but I can't provide information on that topic."
-
   utter_free_chitchat_response:
   - text: "Hello! I'm here to help with class materials and learning support. Let me know what you need!"
   - text: "Hi! I specialize in assisting with course-related questions. Do you need help with something specific?"
@@ -76,7 +60,6 @@ responses:
 
 actions:
   - action_fetch_class_material
-  #- action_answer_general_question
 
 session_config:
   session_expiration_time: 60
