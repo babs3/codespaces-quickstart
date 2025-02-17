@@ -12,11 +12,6 @@ language: en
 
 #pipeline: null
 pipeline:
-- name: SingleStepLLMCommandGenerator
-  llm:
-    model_group: rasa_command_generation_model
-  flow_retrieval:
-    active: false
 - name: WhitespaceTokenizer
 - name: RegexFeaturizer
 - name: LexicalSyntacticFeaturizer
@@ -59,6 +54,16 @@ pipeline:
 policies: #null
 #- name: RulePolicy
 - name: FlowPolicy
+- name: EnterpriseSearchPolicy
+  llm:
+    type: "openai"
+    model: "gpt-3.5-turbo"
+  embeddings:
+    type: "openai"
+    model: "text-embedding-ada-002"
+  vector_store:
+    type: "faiss"
+    source: "./docs"
 # # No configuration for policies was provided. The following default policies were used to train your model.
 # # If you'd like to customize them, uncomment and adjust the policies.
 # # See https://rasa.com/docs/rasa-pro/concepts/policies/policy-overview for more information.

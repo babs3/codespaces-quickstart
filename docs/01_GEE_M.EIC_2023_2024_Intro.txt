@@ -1,0 +1,750 @@
+1
+Enterprise Management and
+Entrepreneurship
+M.EIC 2022-2023
+José Coelho Rodrigues, Manuel Aires de Matos
+jpcr@fe.up.pt
+
+Teaching team
+2
+MANUEL AIRES DE MATOS
+Invited Assistant of DEGI, FEUP.
+Researcher at the Center of Industrial Engineering and Management of INESC TEC.
+PhD Candidate in Industrial Engineering and Management (FEUP),
+Master in Economics (FEP), Master in Marketing (FEP),
+Undergraduate in Management (Católica Porto).
+JOSÉ COELHO RODRIGUES
+Assistant Professor of DEGI, FEUP.
+Researcher at the Center for Innovation, Technology and Entrepreneurship of INESC TEC.
+PhD in Industrial Engineering and Management and
+Master in Electrical and Computer Engineering by FEUP.
+
+3
+William Henry Gates III (born October 28, 1955) is an 
+American business magnate, software developer, investor, and 
+philanthropist. He is best known as the co-founder of Microsoft 
+Corporation.[2][3] During his career at Microsoft, Gates held the 
+positions of chairman, chief executive 
+officer(CEO), president and chief software architect, while also 
+being the largest individual shareholder until May 2014. He is 
+one of the best-known entrepreneurs and pioneers of 
+the microcomputer revolution of the 1970s and 1980s.
+
+4
+
+What do you want management 
+for (past year poll)
+• Creating a company
+• Better understand how the role of software 
+engineers in organizations
+• Understand the interconnections between 
+IT and financial decisions
+• Better collaborate with multidisciplinary 
+teams in organizations
+• Become rich!
+5
+
+GEE objectives
+1. Understand the role of the manager and management, as well as its 
+evolution.
+2. Understand and explore how information technology can enable the firm's 
+management and strategy. 
+3. Understand the different functional areas of financial management, 
+marketing and operations, and how they can be integrated in the firm's 
+strategy.
+4. Apply a set of concepts, methods and tools of financial management, 
+marketing, operations and strategy to analyze problems, identify alternatives 
+and make decisions. 
+5. Be able to apply management methods and tools to analyze company's 
+management and identify improvements.
+6. Recall and describe the components of a business model and how they work 
+together to create, deliver, and capture value.
+7. Apply the conceptual frameworks from the previous point to develop and 
+analyze business models and entrepreneurial strategies.
+6
+
+7
+Program
+1. Introduction - Management and its context
+2. Management functional areas and strategy
+2.1. Financial management 
+2.2. Marketing 
+2.3 Operations management  
+2.4. Strategic management and competitiveness
+3. Entrepreneurship – From Idea to Business
+3.1. Business Models and Strategic Learning and Experimentation
+3.2. Product-Market Fit – Value Proposition and Customer Segments
+3.3. Connecting to Customers – Customer Relationships, Distribution Channels
+and Revenue Streams
+3.4. Operations – Key Activities, Key Resources, Key Partners and Cost
+Structure
+3.5. Entrepreneurial Strategy – An Integrative Logic
+
+8
+Grading
+• Final exam (25%)
+• Group assigments (60%): 
+– report and discussion of 3 case studies (20% 
+each):
+• Individual in class participation (15%):
+– individual case study discussion (5% each)
+
+Grading – other conditions
+• Students who do not attend the case study 
+discussion class will have 0 (zero) in the 
+discussion component evaluation, which 
+represents 50% of the case study grade.
+• The minimum grade of 7,5 is required for each 
+evaluation component
+9
+
+Case study discussion
+• Discussion of real life situations with a 
+specific problem at hand
+• The teams should analyze the situation, 
+and propose a course of action
+• The cases offer the information available 
+to managers at the time
+• Case studies aim at developing analytical, 
+communication and  decision skills
+10
+
+Case studies
+• Case studies covering management topics
+– Short cases/exercises for discussion in class 
+(no assessment)
+– Three case studies for analysis and 
+discussion in class
+11
+
+Case study discussions – short 
+cases
+• More descriptive, with and analysis of a 
+real world situation to illustrate 
+management concepts 
+– Read the case before class
+– Exercises in class
+– Discuss in class
+12
+
+Case study assignment with 
+evaluation
+• Groups of 5 students
+• Report with case study analysis (up to 20 
+slides + excel file) – all groups
+• Presentation of case study summary
+• Discussion in class – all groups
+• All students need to prepare and discuss 
+all case studies in class
+• Each student intervention cannot take 
+longer than 5 minutes
+13
+
+Schedule for the semester
+14
+Carnival
+Easter
+Academic week
+Week
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+(Monday)
+5/feb
+12/feb
+19/feb
+26/feb
+4/mar
+11/mar
+18/mar
+25/mar
+1/apr
+8/apr
+15/apr
+22/apr
+29/apr
+6/may
+13/may
+20/may
+Monday Module
+Pres
+Entrep
+Entrep
+Markt.
+Markt.
+CS1
+CS2
+Op. Strat. Fin. Man. Fin. Man.
+Strat.
+CS3
+classes Prof.
+JCR + MAM
+JCR
+JCR
+MAM
+MAM
+JCR
+MAM
+JCR
+JCR
+JCR
+JCR
+JCR
+Notes
+Tuesday Module
+Pres
+Entrep
+Entrep
+Markt.
+Markt.
+CS1
+CS2
+Op. Strat. Fin. Man. Fin. Man. Gest. Fin.
+Strat.
+CS3
+classes Prof.
+JCR + MAM
+JCR
+JCR
+MAM
+MAM
+JCR
+MAM
+JCR
+JCR
+JCR
+JCR
+JCR
+JCR
+Notes
+Wednesday Module
+Pres
+Entrep
+Entrep
+Markt.
+Markt.
+CS1
+CS2
+Op. Strat. Fin. Man. Fin. Man.
+Strat.
+CS3
+classes Prof.
+JCR + MAM
+JCR
+JCR
+MAM
+MAM
+JCR
+MAM
+JCR
+JCR
+JCR
+JCR
+JCR
+Notes
+
+Evaluation
+• Case study analysis and discussion – 60% 
+- 20% each case study (10% report/10% 
+discussion)
+• Case study individual discussion – 15% -
+5% each case study
+• Dates:
+- 18.03 / 20.03
+- 02.04 / 08.04
+- 20.05 / 22.05
+15
+
+Case study discussion
+• Discussion of real life situations with a 
+specific problem at hand
+• The teams should analyze the situation, 
+and propose a course of action
+• The cases offer the information available 
+to managers at the time
+• Case studies aim at developing analytical, 
+communication and  decision skills
+• No interventions with more than 5 minutes16
+
+Case study preparation
+• Read the first few paragrahs, then go through 
+the case as almost as fast as you can
+• Read the case very carefully, underlining the key 
+facts and writing notes
+• Note the key problems
+• Sort out the relevant considerations for each 
+problem area
+• Do appropriate qualitative and quantitative 
+analysis
+• Develop a set of recommendations, supported 
+by your analysis of the case data
+17
+
+Case study report
+• 20 slides ppt report with
+– If Professors provide a set of questions, they 
+should be addressed in the report. Some of 
+the points may be:
+• Case study introduction
+• Problem identification
+• Data analysis
+• Recommendations, supported by data analysis
+– Due date: beginning of class of first 
+presentation
+18
+
+Case study discussion
+• Active participation – all team members 
+should participate
+• The objective is not to reach a consensus, 
+but to explore multiple perspectives
+• There is no unique solution – multiple 
+viable options can be analyzed
+• Professors are facilitators of the 
+discussion – they do not provide answers 
+to the problem at hand
+19
+
+Case study recommendations
+• Prepare
+• Discuss the case with others beforehand
+• Participate
+• Share your related experience
+• Try to relate the topic and the case with other 
+business situations
+• Try to understand and integrate the views of 
+other participants
+20
+
+Case study Report recommendations
+- up to 20 slides
+•
+Take into account that the slide report will be used to assess your 
+work and use the 20 slides limit.
+•
+Develop an appealing presentation, but also add relevant 
+information to the report. One possible way to make this balance is 
+to have more visual slides, and then add notes to the ppt file for 
+more detail.
+•
+Use the concepts and tools from classes whenever relevant
+•
+Make your assumptions explicit
+•
+Support your statements with data, e.g. show tables and graphics 
+that support your analysis and proposal. 
+•
+On the other hand, do not have tables without an explanation.
+•
+If you have to choose between alternatives, explore multiple ones, 
+analyze pros and cons of each one, and support your decision
+21
+
+Case study discussion 
+recommendations
+•
+Every group member must participate
+•
+Everyone needs to be aware and able to participate in the 
+discussion of every question
+•
+Everyone needs to be able to explain how you reached the results in 
+the spreadsheet
+•
+Remember quality of participation is more important than quantity
+•
+Do not read the slides, use them to support your argument
+•
+Do not make a sequence of presentations, engage in discussion
+•
+Do not repeat what others have said, build upon, for example 
+summarizing what is similar to what the previous group said, and 
+complement
+•
+This is not a zero sum game, you can all contribute to enrich the 
+discussion and have a good grade
+•
+Learn and enjoy!
+22
+
+23
+Fundamental concepts of
+management
+Bibliografia: 
+Gomez-Mejia, Luis R., David B. Balkin e 
+Robert L. Cardy; Management: people, 
+performance, change, McGraw-Hill , 2012, 
+cap. 1. 
+
+24
+The importance of organizations
+• Organization is a major force in society today: We are 
+born in organizations called hospitals, are educated by 
+organizations called schools, and later work in 
+organizations. At the same time organizations supply us, 
+entertain us and rules us. Finally we are buried by 
+organizations called funeral homes.
+Mintzberg, 1989
+
+25
+Management
+–
+Management is a process undertaken by one or 
+more people to coordinate others activities, to 
+achieve results that would not be possible by 
+individuals acting alone.
+–
+Donelly, Gibson e Ivancevich, 2000
+
+26
+Stakeholders
+All actors that have a stake on the organization
+shareholders
+employees
+customers
+suppliers
+partners
+Public
+associations
+Political power
+organization
+
+27
+The management process
+Planning
+Organization
+leadership
+control
+
+28
+Planning
+• Setting an organization’s goals and selecting a 
+course of action from a set of alternatives to 
+achieve them.
+objectives
+strategy
+
+29
+Organization
+The management function that determines how 
+the firm’s human, financial, physical, 
+informational, and technical resources are 
+arranged and coordinated to perform tasks to 
+achieve desired goals.
+The deployment of resources 
+to achieve strategic goals.
+
+30
+Leadership
+• The management function that energizes 
+people to contribute their best individually 
+and in cooperation with other people
+• This involves:
+– Clearly communicating organizational goals
+– Inspiring and motivating employees
+– Providing an example for others to follow
+– Guiding others
+– Creating conditions that encourage 
+management  of diversity
+
+31
+Control
+• The management function that measures 
+performance, compares it to objectives, 
+implements necessary changes, and monitors
+progress.
+• Many of these issues involve feedback or 
+identifying potential problems and taking  
+corrective action.
+
+32
+Manager roles
+interpersonal
+Decision
+making
+information
+Mintzberg
+
+33
+Management through people
+• Interpersonal relationship with the
+organizational employees
+• Interconnections outside the organization
+development of contact networks
+• Representation
+• Leadership
+
+34
+Management through
+information
+Communication
+Data collecton, environmental analyisis
+Development of contact networks to collect
+and share information
+Representation of the team and organization
+Control
+Usding the information to follow the
+performance of the team or the organization
+
+35
+Management through action
+• Initiative (entrepreneurship and
+intrapreneurship)
+• Problem and conflict resolution
+• Change management
+• Resource allocation
+• Negotiation
+
+36
+Management skills
+Conceptual
+skills
+Human
+skills
+Technical
+skills
+Hierarchical
+level
+high
+low
+
+37
+Technical skills
+• Knowledge and ability to use instruments,
+procedures and techniques in a specific area.
+
+38
+Human skills
+• Ability to work in team, whether as a 
+member or a leader.
+– Ability to lead, train and motivate people
+– Ability to develop and foster team work
+– Development and maitenance of the
+organization culture
+– Establishement of collaboration
+networks
+
+39
+Conceptual skills
+• Ability to have a systemic, holistic view of
+the organization, integrated in its internal
+and external environment, and awareness
+of the interrelationships between areas.
+
+40
+The evolution of Management
+Bibliografia: 
+Gomez-Mejia, Luis R., David B. Balkin e Robert L. 
+Cardy; Management , McGRaw-Hill , 2012, cap. 1. 
+
+41
+Rules to be observed and kept by the people
+employed by an English factory in the XIX century
+1.
+Each person employed in this factory engages to serve THOMAS 
+AINSWORTH AND SONS, and to give one month’s notice, in writing, 
+previous to leaving his or her employment, such notice to be given on a 
+Saturday, and on no other day. But the Masters have full power to 
+discharge any person employed therein without any previous notice 
+whatsoever.
+2.
+The hours of attendance are from Six o’clock in the morning until half-
+past Seven at Night, excepting Saturday when work shall cease and half-
+past Four…
+3.
+....
+4.
+Any person smoking tobacco, or having a pipe for that purpose in any 
+part of the Factory, shall pay a forfeit of 5 shillings.
+5.
+Any person introducing a Stranger into the Factory, without the leave of 
+one of the proprietors, shall forfeit 2 shillings and 6 pence.
+6.
+Any person employed in this factory engages not to be a member of, or 
+directly or indirectly a subscriber to, or a supporter of, any Trades Union, 
+or other Association whatsoever. Any Person destroying or damaging this 
+Paper, shall pay 5 shillings.
+Gabriel, Fineman and Sims (2000)
+
+42
+Night shift in an Indiana glass factory, August 1908
+
+43
+In the event of a fire
+1. Stay calm.
+2. Locate the fire.
+3. Call the fire brigade.
+4. Close windows and doors.
+5. When the fire brigade arrives, introduce
+yourself.
+6. If possible, put out the fire.
+
+44
+Nordstrom’s rules
+WELCOME TO NORDSTROM
+We are gald to have you with our company.
+Our number one goal is to provide an outstanding customer service.
+Set both personal and professional goals high. We have great confidence in
+your ability to achieve them.
+Nordstrom’s rules
+Rule 1: use your good judgement in all situations
+There will be no additional rules
+Please feel free to ask your department manager any question anytime
+
+The evolution of management
+• Classical Perspective
+• Behavioral Perspective
+• Systems Theory
+• Contingency Theory
+• The Learning Organization
+45
+
+Classical perspective
+• The organization is viewed as a mechanical 
+system.
+• Scientifically study each part of a task and develop 
+the best method of performing the task - Division
+of Work
+• Main goal : Improving efficiency and productivity
+• Workers are a part of the machine and act 
+rationally. 
+• Management as Impersonal and Rational -
+Bureaucratic Organizations
+• Successful Employees - Rewarded
+• Unsuccessful Employees - Terminated
+46
+
+Classical perspective
+• Scientific Management (Frederick Taylor  -
+1856-1915)
+– Focusing on the management of work and workers.
+• Administrative Management (Henry Fayol -
+1841-1925)
+– Addressing issues concerning how overall 
+organization should be structured.
+• Bureaucratic Management (Max Weber -
+1864-1920)
+– Looks at the organization as a rational entity, using 
+impersonal rules and procedures to decision 
+making.
+47
+
+The evolution of management
+• Behavioral Perspective 
+– The organization is viewed as an organic
+system.
+– Acknowledges that psychological and social 
+processes of human behavior can result in 
+improvements in productivity and work 
+satisfaction.
+– The relationship between employees and a 
+supervisor is a vital aspect of management.
+• Employee motivation
+• Leadership style
+– The informal organization
+– Naturally occurring Social Groupings
+48
+
+The evolution of management
+The discovery that paying special attention 
+to employees motivates them to put 
+greater effort into their jobs.
+(from the Hawthorne management studies, performed from 1924 –
+1932 at Western Electric Company’s plant near Chicago)
+Behavioral Perspective
+49
+
+SupplSup
+Systems theory
+• Views the organization as a system of
+interrelated parts that function in a holistic
+way to achieve a common purpose.
+Organization
+Suppliers
+Customers
+Competitors
+Stakeholders
+Regulatory 
+Agencies
+Environment
+50
+
+Contingency theory
+• States that there is no “one best way” to 
+manage an organization.
+– Because what works for one organization may 
+not work for another
+– Situational characteristics (contingencies) 
+differ
+– Managers need to understand the key 
+contingencies that determine the most 
+effective management practices in a given
+situation
+51
+
+Learning Organization
+• A Learning Organization (Peter Senge)
+– The management approach based on an 
+organization anticipating change faster than 
+its counterparts to have an advantage in the 
+market over its competitors.
+52
+
+53
+Adaptive learning
+1.Environmental 
+analysis
+3. Corrective
+actions
+2. Compare 
+information with
+objectives
+•Learning as an abaility to 
+adapt to changes in the
+environment (reactive
+adaptation)
+•The organization learns
+without changing its basic
+assumptions
+
+54
+Creative learning
+1. Environmental
+analysis
+3. Corrective
+actions
+2. Compare 
+information with
+objectives
+2a. Questionning if
+norms and objectives
+are adequate
+•Learning as innovation
+•Anticipate change and proactive change
+•Re-thinking the organization’s basic assumptions
+
+The virtual organization and
+value networks
+• Organizations increasingly compete 
+through value networks, focusing on their
+core competences and establishing
+partnerships within the value network to 
+offer more complete solutions to their
+customers
+55
+
+Case study
+Password! Mike’s story
+56
+

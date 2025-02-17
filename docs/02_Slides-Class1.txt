@@ -1,0 +1,612 @@
+1
+Enterprise Management and
+Entrepreneurship
+MIEIC 2022-2023
+José Coelho Rodrigues, Manuel Aires de Matos
+
+Entrepreneurship:
+from idea to business
+2
+José Coelho Rodrigues
+
+Content
+• Introduction
+• Strategic Learning and Experimentation
+• Business Models
+– Product-Market Fit
+– Connecting to customers
+– Operations
+• Entrepreneurial Strategy – An integrative
+logic
+3
+
+Entrepreneurship
+4
+Introduction
+
+Introduction – from idea do business
+• What does it take to go from an idea to a 
+business?
+– Business Model + Customer Development
+– Hypothesis testing of the business model(s)
+– Get “out of the building”
+• Difference between a vision and a hallucination
+• Experiential learning: talk to stakeholders –
+customer, partners, competitors…; observation
+5
+
+Introduction – from idea do business
+Definitions:
+• Company
+– A business organization which sells a product or 
+service in exchange for revenue and profit
+• Startup
+– A temporary organization designed to search for a 
+repeatable and scalable business model
+– A Startup aims to become a company
+6
+
+Introduction – from idea do business
+What we used to believe vs. What we now know
+• Startups are a smaller version of a Large
+company
+• Startups Search;
+Companies Execute
+7
+
+Introduction – from idea do business
+What we used to believe vs. What we now know
+Strategy
+• Start with an Operating Plan and Financial Model
+–
+All I need to do is Execute the Plan
+–
+All I need to do is Make the Forecast
+• No Business Plan survives first contact with
+customer
+–
+Planning comes before the plan
+8
+Osterwalder, A., & Pigneur, Y. (2010). Business model generation: a handbook for visionaries, game changers, and challengers. 
+John Wiley & Sons.
+
+Introduction – from idea do business
+What we used to believe vs. What we now know
+Process
+• We built startups by managing processes
+–
+Product introduction model
+–
+Waterfall engineering
+(execution on two “knowns”)
+• More startups fail from a lack of customers than
+from a failure of product development
+9
+
+What we used to believe vs. What we now know
+Organization
+• Hire and build a Funcional Organization
+• Founders run a customer development team
+– No sales, marketing and business development
+Introduction – from idea do business
+10
+
+Search
+Execute
+Strategy
+Business Model
+Operating Plan +
+Hypothesis
+Financial Model
+Process
+Customer Development
+Product Management
+Agile development
+Agile or Waterfall
+development
+Organization
+Customer Development
+Functional Organization
+Team, founder-driven
+by Department
+Introduction – from idea do business
+11
+
+Introduction – from idea do business
+• Entrepreneurship begins with the Search for a 
+Business Model
+• Experiential learning to validate hypothesis about 
+business model (and identify patterns)
+12
+
+Entrepreneurship
+13
+Strategic Learning and
+Experimentation
+
+Strategic Learning and Experimentation
+• Entrepreneurship begins with the Search for a 
+Business Model
+• Create hypothesis (“guesses”)
+14
+
+Strategic Learning and Experimentation
+• How do we change “guesses” into facts?
+• The customer development process
+15
+
+Strategic Learning and Experimentation
+• How do we change “guesses” into facts?
+• The customer development process
+16
+
+Strategic Learning and Experimentation
+How to build a Startup?
+17
+Idea
+Size  of the 
+Opportunity
+Business 
+Model(s)
+Customer 
+Discovery
+Customer 
+Validation
+Business 
+Model(s)
+Size of the 
+Opportunity
+Theory
+Practice
+
+Strategic Learning and Experimentation
+How to build a Startup?
+•
+Experimenting to resolve 
+uncertainty!
+–
+Learn through rounds of organized
+testing
+–
+Need uncertainty
+–
+Technical uncertainty
+–
+Production uncertainty
+18
+Idea
+Size  of the 
+Opportunity
+Business 
+Model(s)
+Customer 
+Discovery
+Customer 
+Validation
+Business 
+Model(s)
+Size of the 
+Opportunity
+Hypothesis
+Design
+Experiment
+Test
+Insight
+
+Strategic Learning and Experimentation
+How to build a Startup?
+•
+Experimenting to resolve 
+uncertainty!
+•
+First test the problem (need)
+•
+Then test the solution (technical/production)
+19
+Idea
+Size  of the 
+Opportunity
+Business 
+Model(s)
+Customer 
+Discovery
+Customer 
+Validation
+Business 
+Model(s)
+Size of the 
+Opportunity
+Hypothesis
+Design
+Experiment
+Test
+Insight
+
+Strategic Learning and Experimentation
+Customer discovery
+1.
+State hypothesis
+–
+Draw Business Model
+2.
+Test the problem
+–
+Get out of the building
+–
+Test understanding of customer problem or need
+3.
+Test the solution
+–
+Build prototype
+–
+Test product-market fit
+4.
+Verify or pivot business model
+20
+
+Strategic Learning and Experimentation
+Pivot
+•
+Pivots are possible results of hypothesis testing and experimentation
+–
+Hypothesis testing involves failure!
+•
+Pivot is a substantive change to one or more components of the 
+business model
+–
+Iterations are minor changes
+•
+In a pivot, dismiss hypotheses that do not match reality
+–
+BUT, save the knowledge built!!!
+21
+
+Strategic Learning and Experimentation
+Customer validation
+1.
+Get ready to sell
+–
+Acquire customer; Prepare distribution channels
+–
+Build Minimum Viable Product (MVP) – minimum features required to get
+customers’ feedback (and then add more features)
+2.
+Get out of the building
+–
+“Test sell” to early evangelists
+3.
+Develop positioning
+–
+Corporate and product positioning
+4.
+Verify the business model (pivot or proceed)
+–
+Repeatable and scalable?
+22
+
+Strategic Learning and Experimentation
+The example of IDEO
+https://www.youtube.com/watch?v=BPQt3XsfK9o
+•
+Company built on the ability to create innovation in a predictable
+manner
+23
+
+Strategic Learning and Experimentation
+The example of IDEO
+https://www.youtube.com/watch?v=BPQt3XsfK9o
+•
+Company built on the ability to create innovation in a predictable
+manner
+Highlights:
+•
+Learn from failure
+–
+Disqualify failed experiments and continue search
+–
+“Fail often to succeed sooner”
+–
+Avoid mistakes! Mistakes produce no new/useful information (≠ failure)
+•
+Knowledge from failure or success can be stockpilled
+–
+Know what does not work is as important as knowing what does
+–
+Critical to keep track of failed hypothesis
+24
+
+Strategic Learning and Experimentation
+• How do we change “guesses” into facts?
+• The customer development process
+25
+
+Entrepreneurship
+26
+Business Models
+
+Business Models
+27
+• How do we create value?
+• How do we deliver value to customers?
+• How do we capture the value delivered?
+
+Business Models
+28
+Business Model Canvas
+Value Propositions
+Revenue Streams
+Key Partners
+Key Activities
+Customer 
+Relationships
+Customer 
+Segments
+Key Resources
+Channels
+Cost Structure
+What are we
+building and
+for whom?
+Who are our
+customers?
+Why would
+they buy?
+How does the
+product get to
+customers?
+How do we
+get, keep and
+grow
+customers?
+How does the company make
+money from each customer 
+segment?
+What are the
+most important
+assets to make
+the business 
+model work?
+Who are the 
+key partners
+and suppliers
+needed to 
+make the 
+business 
+model work?
+What are the
+most important
+activities to 
+make the 
+business 
+model work?
+What are the costs to operate
+the business model?
+
+Business Models
+29
+Other models
+Wirtz, B. W., Pistoia, A., Ullrich, S. 
+& Gottel, V. (2016). “Business 
+models: origin, development and 
+future research perspectives”. Long 
+range planning, 49(1): 36-54.
+
+Business Models
+30
+Other models
+Wirtz, B. W., Pistoia, A., Ullrich, S. 
+& Gottel, V. (2016). “Business 
+models: origin, development and 
+future research perspectives”. Long 
+range planning, 49(1): 36-54.
+
+Entrepreneurship
+31
+Business Models
+Product-Market Fit
+
+Business Models – Product-Market Fit
+32
+Business Model Canvas
+Value Propositions
+Revenue Streams
+Key Partners
+Key Activities
+Customer 
+Relationships
+Customer 
+Segments
+Key Resources
+Channels
+Cost Structure
+
+Business Models – Product-Market Fit
+Customer Segments
+•
+Customer Archetype
+–
+Who is the customer?
+•
+Job-to-be-done
+–
+What is the customer problem that you are solving?
+•
+Customer Workflow
+–
+What is the context in which the job arises and your solution is going to be
+purchased and used?
+•
+Current solutions
+–
+How is the job currently done?
+–
+What are the pros & cons of each alternative?
+33
+
+Business Models – Product-Market Fit
+Customer Segments
+•
+Customer Archetype
+–
+Who is the customer?
+–
+How does the customer buy?
+–
+What matters to the customer?
+–
+Who influences the customer?
+•
+Influencer / Recommender / Decision Maker / Economic Buyer / Saboteur…
+34
+© 2009 Prentice Hall
+
+Business Models – Product-Market Fit
+Customer Segments
+•
+Customer Archetype
+–
+Who is the customer?
+–
+How does the customer buy?
+–
+What matters to the customer?
+–
+Who influences the customer?
+•
+Influencer / Recommender / Decision Maker / Economic Buyer / Saboteur…
+–
+Market type
+35
+New
+Resegmented
+Existing
+Unknown
+Possibly known
+Known
+Customers
+Transformational
+improvement
+Better fit 
+(niche or low cost)
+Performance
+Needs
+None
+Many if wrong, 
+few if right
+Many
+Competitors
+Education cycle
+Market and product 
+redefinition
+Lack of ecosystem 
+(branding, sales, 
+distribution)
+Risks
+
+Business Models – Product-Market Fit
+Customer Segments
+•
+Job-to-be-done
+–
+What jobs are getting done?
+–
+What basic needs are you helping your customer satisfy?
+–
+What are (not) customer needs?
+•
+A customer need is a description of the benefits that customers want
+•
+It is different from a product feature: a description of how that need gets 
+satisfied
+•
+To succeed at new product introduction, companies need to understand 
+customer needs; many companies have failed because they did not 
+understand their customers’ needs
+–
+What causes customers to buy a solution?
+•
+Customers have “jobs” that arise regularly and need to get done
+•
+They look for what they can hire to get the job done effectively, conveniently
+and inexpensively
+36
+
+Business Models – Product-Market Fit
+Customer Segments
+•
+Customer Workflow
+–
+What is the context in which the job arises and your solution is going to be
+purchased and used?
+–
+Draw a day in the life of the customer
+•
+Current solutions
+–
+How is the job currently done?
+–
+What are the pros & cons of each alternative?
+37
+
+Business Models – Product-Market Fit
+Value Propositions
+•
+Solution
+–
+What are you actually selling?
+–
+Focus on the customer
+•
+Unique Features
+–
+What advantages set you appart from competition?
+–
+How protectable are they?
+•
+Key Benefits
+–
+How does the customer benefit from the unique features of the solution?
+–
+What core and additional services are part of your value proposition?
+38
+
+Business Models – Product-Market Fit
+Value Propositions
+•
+Solution
+–
+Minimum Viable Product
+•
+The minimum set of features needed to learn from early adopters (early
+evangelists)
+•
+Solves a core problem for customer
+•
+“low fidelity” solution to get feedback from customer (later transformed into
+“high fidelity” solution when understanding about the problema is confirmed)
+•
+Unique Features / Key benefits
+–
+Types of Value Propositions
+39
+
+Business Models – Product-Market Fit
+40
+
+References
+•
+Blank, S., & Dorf, B. (2012). The startup owner's 
+manual. K&S; Ranch.
+•
+Osterwalder, A., & Pigneur, Y. (2010). Business model 
+generation: a handbook for visionaries, game changers, 
+and challengers. John Wiley & Sons.
+•
+Van Mieghem, J. A. (2008), Operations Strategy: 
+Principles and Practice, Dynamic Ideas.
+•
+Zenios et al. (2010), Biodesign – the process of 
+innovating medical technologies, Cambridge University 
+Press, New York.
+80
+

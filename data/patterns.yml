@@ -5,12 +5,6 @@ flows:
     steps:
       - action: utter_free_chitchat_response
 
-  pattern_search:
-    description: Handle general knowledge questions that are relevant to learning.
-    name: pattern general knowledge
-    steps:
-      - action: action_answer_general_question
-
       
   # seems not to work...    
   pattern_session_start:

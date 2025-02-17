@@ -1,0 +1,759 @@
+1
+Enterprise Management and
+Entrepreneurship
+MIEIC 2022-2023
+José Coelho Rodrigues, Manuel Aires de Matos
+
+Entrepreneurship:
+from idea to business
+2
+José Coelho Rodrigues
+
+Content
+• Introduction
+• Strategic Learning and Experimentation
+• Business Models
+– Product-Market Fit
+– Connecting to customers
+– Operations
+• Entrepreneurial Strategy – An integrative
+logic
+3
+
+Entrepreneurship
+41
+Business Models
+Connecting to customers
+
+Business Models – Connecting to customers
+42
+Business Model Canvas
+Value Propositions
+Revenue Streams
+Key Partners
+Key Activities
+Customer 
+Relationships
+Customer 
+Segments
+Key Resources
+Channels
+Cost Structure
+
+Business Models – Connecting to customers
+Channels
+•
+Types of channel used
+–
+Direct / Indirect (/ Licensing)
+–
+Virtual / Physical
+•
+Channel partners
+–
+Who are your channel partners? (-> Key Partners)
+–
+How and why are they interested in partnering?
+•
+Channel flow diagram
+•
+Channel economics (-> Costs + Revenue Streams)
+43
+
+Business Models – Connecting to customers
+Channels
+•
+Types of channel used – What influences channel choice
+–
+Customer needs
+•
+Product/service, experience, complementary products and services
+–
+Industry channel capabilities and costs
+•
+Time, quality, flexibility, cost
+–
+Power and influence
+•
+Uniqueness
+•
+Market access and intelligence
+•
+Scale
+•
+Dependence
+–
+Competition
+•
+Nature of overall industry competition and of channel competition
+44
+
+Business Models – Connecting to customers
+Channels
+•
+Types of channel used – Designing channels
+–
+Structure – Direct / Indirect
+•
+Size and distribution of customers
+•
+Level of education required and breadth of applications
+•
+Individual or bundled purchase
+•
+Credibility and specific knowledge requirement
+•
+Comparative size
+•
+Strategy – working capital, scale, learning, etc.
+–
+Coverage
+•
+Intensive – well known and branded products, or commodities
+•
+Selective – significant sales effort or strategic partnership required – avoid
+channel conflicts due to, e.g., free riding
+45
+
+Business Models – Connecting to customers
+Channels
+•
+Types of channel used – Examples in medical devices
+–
+High value medical products for medical doctors
+Direct and selective sales
+46
+Customer 
+needs
+Customer 
+needs
+Training
+Training
+Full support
+Full support
+Customizations
+Customizations
+Trend for 
+standardization
+Trend for 
+standardization
+Capabilities 
+and costs
+Capabilities 
+and costs
+Flexibility
+Flexibility
+Quality
+Quality
+Power and 
+influence
+Power and 
+influence
+Sales reps
+Sales reps
+Product 
+uniqueness
+Product 
+uniqueness
+Nature of 
+competition
+Nature of 
+competition
+Technology
+Technology
+Performance
+Performance
+Trust
+Trust
+
+Business Models – Connecting to customers
+Channels
+•
+Types of channel used – Examples in medical devices
+–
+Commodity medical products for administrative purchasers
+Indirect and intensive sales
+47
+Customer 
+needs
+Customer 
+needs
+Cheap
+Cheap
+Compliant
+Compliant
+Volume
+Volume
+Basket
+Basket
+Capabilities 
+and costs
+Capabilities 
+and costs
+Cost
+Cost
+Power and 
+influence
+Power and 
+influence
+Scale
+Scale
+Market access
+Market access
+Nature of 
+competition
+Nature of 
+competition
+Cost
+Cost
+Reliability of 
+supply
+Reliability of 
+supply
+
+Business Models – Connecting to customers
+Channels
+•
+Types of channel used – Web (Virtual) vs. Physical
+48
+Channel
+Physical
+Virtual
+•
+Insurance
+•
+Enterprise
+software
+•
+Stocks and
+Bonds
+•
+…
+•
+Google
+•
+Facebook
+•
+Twiter
+•
+…
+Virtual
+Product
+•
+Food
+•
+Household
+goods
+•
+Automobiles
+•
+Planes
+•
+…
+•
+Consumer 
+electronics
+•
+Movies
+(Streaming)
+•
+Books
+(Amazon)
+•
+…
+Physical
+
+Business Models – Connecting to customers
+Channels
+•
+Channel economics
+–
+Direct sales
+–
+Indirect sales
+49
+
+Business Models – Connecting to customers
+Customer Relationships
+•
+Strategy for Get / Keep / Grow customers
+–
+How to get / keep / grow customer?
+–
+What key metrics / indicators to use?
+•
+Customer Acquisition Cost (CAC) (-> Costs)
+•
+Customer Lifetime Value (LTV) (-> Revenue Streams)
+50
+
+Business Models – Connecting to customers
+Customer Relationships
+•
+Strategy for Get / Keep / Grow customers
+51
+
+Business Models – Connecting to customers
+Customer Relationships
+•
+Strategy for Get / Keep / Grow customers
+–
+Physical products
+52
+
+Business Models – Connecting to customers
+Customer Relationships
+•
+Strategy for Get / Keep / Grow customers
+–
+Virtual products
+53
+
+Business Models – Connecting to customers
+Customer Relationships
+• Customer Acquisition Cost (CAC) vs. Customer Lifetime Value (LTV)
+–
+LTV > 3 x CAC
+–
+< 12 months to
+recover CAC
+54
+CAC
+LTV
+
+Business Models – Connecting to customers
+Customer Relationships
+• Customer Acquisition Cost (CAC) vs. Customer Lifetime Value (LTV)
+55
+
+Business Models – Connecting to customers
+Revenue Streams
+•
+Revenue model / Pricing model
+–
+Direct sales; Licensing; Subscriptions; “Razor-blade” model; Leasing; …
+•
+Payment flow
+•
+Define and Size Target Market
+•
+Sales Projections (Market model)
+–
+Top-down vs. Bottom-up approaches
+–
+How many must we sell? At what price?
+56
+
+Business Models – Connecting to customers
+Revenue Streams
+•
+Revenue model (Examples)
+–
+Direct sales / asset sale: Continente; Ford…
+–
+Usage fee: Amazon web services; CTT…
+–
+Subscription fee: Netflix; Disney+…
+–
+Renting: Europcar; Sixt…
+–
+Licensing: Microsoft…
+–
+Intermediation fee: Airbnb…
+–
+Advertising: Google, Facebook…
+57
+
+Business Models – Connecting to customers
+Revenue Streams
+58
+
+Business Models – Connecting to customers
+Revenue Streams
+•
+Sales Projections (Market model)
+–
+Top-down approach
+•
+“Back of the envelope” market estimates (based on statistics)
+•
+Forecasts are projected as yearly revenues
+•
+Outline segments of addressable market (How many customers? Will there be 
+growth? …)
+•
+Quick estimation of how attractive the market is
+59
+
+Business Models – Connecting to customers
+Revenue Streams
+•
+Sales Projections (Market model)
+–
+Bottom-up approach
+Focus on individual sales first
+1. Define fundamental unit of the business (what drives the business in the 
+market?)
+2. Consider sales cycle (time and cost of selling 1 unit)
+3. Consider adoption curve (rate of adoption)
+Focus on building/growing the business
+4. Build the commercial effort (how many sales reps to hire)
+5. Consider market development factors (external environment)
+6. Consider product evolution (new releases in the future)
+7. Consider other factors (seasonality, trends…)
+60
+
+Business Models – Connecting to customers
+Revenue Streams
+•
+Sales Projections (example)
+–
+Top-down approach
+10% of a million-person market = 100 000 customers
+–
+Bottom-up approach
+1000 customers/month 1st year => 3000/month 3rd year
+61
+
+Entrepreneurship
+62
+Business Models
+Operations
+
+Business Models – Operations
+63
+Business Model Canvas
+Value Propositions
+Revenue Streams
+Key Partners
+Key Activities
+Customer 
+Relationships
+Customer 
+Segments
+Key Resources
+Channels
+Cost Structure
+
+Business Models – Operations
+Key Partners
+•
+Partners
+–
+What partners will you need? 
+–
+What type of partnerships will you have?
+•
+Reasons for partnering
+–
+Why will you need them?
+–
+Why will they partner with you?
+•
+Risks and Costs
+–
+What are the risks and impediments for you and for them?
+–
+What costs might be associated with the partnership?
+64
+
+Business Models – Operations
+Key Partners
+•
+Partners – What type of partnerships will you have?
+–
+Strategic alliances
+–
+Joint ventures
+–
+Coopetition
+–
+Key suppliers
+65
+
+Business Models – Operations
+Key Resources & Key Activities
+•
+Most important Resources to make the business work
+–
+Physical
+–
+Intellectual: Trademarks; Copyrights; Secrets; NDAs; Patents…
+–
+Human
+–
+Financial
+•
+Most importante Activities to make the business work
+•
+Alignment among Resources and Activities, and with Value
+Propositions and Customer Segments
+66
+
+Business Models – Operations
+Key Resources & Key Activities
+67
+
+Business Models – Operations
+Costs
+•
+Operating plan to build the business
+•
+Costs associated to the operating plan
+68
+
+Business Models – Operations
+Costs
+•
+Underlying questions
+–
+How much does R&D cost? How long does it take?
+–
+How much does it cost to take the product/service to the market?
+–
+How many people do we need?
+–
+Where will we do it (R&D and/or production)?
+–
+How many must we sell? At what price?
+69
+
+Business Models – Operations
+Costs
+•
+Six steps
+1. Operating plan 
+2. Market model (<- Revenue Streams)
+3. Staffing plan
+4. Cost projections
+5. Income statement
+6. Cashflow statement
+70
+
+Business Models – Operations
+Costs
+•
+Six steps
+71
+
+Entrepreneurship
+72
+Entrepreneurial Strategy – An
+integrative logic
+
+Entrepreneurial Strategy – An Integrative logic
+• Entrepreneurship begins with the Search for a 
+Business Model
+• Experiential learning to validate hypothesis about 
+business model (and identify patterns)
+73
+
+74
+How do we create, deliver and capture value?
+Value Propositions
+Revenue Streams
+Key Partners
+Key Activities
+Customer 
+Relationships
+Customer 
+Segments
+Key Resources
+Channels
+Cost Structure
+What are we
+building and
+for whom?
+Who are our
+customers?
+Why would
+they buy?
+How does the
+product get to
+customers?
+How do we
+get, keep and
+grow
+customers?
+How does the company make
+money from each customer 
+segment?
+What are the
+most important
+assets to make
+the business 
+model work?
+Who are the 
+key partners
+and suppliers
+needed to 
+make the 
+business 
+model work?
+What are the
+most important
+activities to 
+make the 
+business 
+model work?
+What are the costs to operate
+the business model?
+Entrepreneurial Strategy – An Integrative logic
+
+• Changing hypothesis into facts
+• The customer development process
+75
+Entrepreneurial Strategy – An Integrative logic
+
+76
+Value Propositions
+Revenue Streams
+Key Partners
+Key Activities
+Customer 
+Relationships
+Customer 
+Segments
+Key Resources
+Channels
+Cost Structure
+Entrepreneurial Strategy – An Integrative logic
+Solution
+Unique Features
+Key Benefits
+Customer Archetype
+Job-to-be-done
+Customer Workflow
+Current solutions
+
+77
+Entrepreneurial Strategy – An Integrative logic
+Value Propositions
+Revenue Streams
+Key Partners
+Key Activities
+Customer 
+Relationships
+Customer 
+Segments
+Key Resources
+Channels
+Cost Structure
+Customer Archetype
+Job-to-be-done
+Customer Workflow
+Current solutions
+Solution
+Unique Features
+Key Benefits
+Types of channel used
+Channel partners
+Channel flow diagram
+Channel economics
+Strategy Get / Keep / 
+Grow customers
+CAC
+LTV 
+Revenue model / Pricing model
+Payment flow / Define and Size Target Market
+Market model
+
+78
+Entrepreneurial Strategy – An Integrative logic
+Value Propositions
+Revenue Streams
+Key Partners
+Key Activities
+Customer 
+Relationships
+Customer 
+Segments
+Key Resources
+Channels
+Cost Structure
+Solution
+Unique Features
+Key Benefits
+Customer Archetype
+Job-to-be-done
+Customer Workflow
+Current solutions
+Types of channel used
+Channel partners
+Channel flow diagram
+Channel economics
+Strategy Get / Keep / 
+Grow customers
+CAC
+LTV 
+Revenue model / Pricing model
+Payment flow / Define and Size Target Market
+Market model
+Partners
+Reasons for partnering
+Risks and Costs
+Key Activities
+Alignment
+Key Resources
+Alignment
+Operating plan
+Costs
+
+79
+Entrepreneurial Strategy – An Integrative logic
+Value Propositions
+Revenue Streams
+Key Partners
+Key Activities
+Customer 
+Relationships
+Customer 
+Segments
+Key Resources
+Channels
+Cost Structure
+Solution
+Unique Features
+Key Benefits
+Customer Archetype
+Job-to-be-done
+Customer Workflow
+Current solutions
+Types of channel used
+Channel partners
+Channel flow diagram
+Channel economics
+Strategy Get / Keep / 
+Grow customers
+CAC
+LTV 
+Revenue model / Pricing model
+Payment flow / Define and Size Target Market
+Market model
+Partners
+Reasons for partnering
+Risks and Costs
+Key Activities
+Alignment
+Key Resources
+Alignment
+Operating plan
+Costs
+
+References
+•
+Blank, S., & Dorf, B. (2012). The startup owner's 
+manual. K&S; Ranch.
+•
+Osterwalder, A., & Pigneur, Y. (2010). Business model 
+generation: a handbook for visionaries, game changers, 
+and challengers. John Wiley & Sons.
+•
+Van Mieghem, J. A. (2008), Operations Strategy: 
+Principles and Practice, Dynamic Ideas.
+•
+Zenios et al. (2010), Biodesign – the process of 
+innovating medical technologies, Cambridge University 
+Press, New York.
+80
+
