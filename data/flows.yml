@@ -22,4 +22,13 @@ flows:
     steps:
       - action: utter_greet
         next: END
-        
+  
+  # Define the Flows with NLU triggers:
+  my_flow:
+    description: "A flow triggered with <mood_great>"
+    nlu_trigger:
+      - intent:
+          name: mood_great
+          confidence_threshold: 0.5  # threshold value, optional
+    steps:
+      - action: utter_happy

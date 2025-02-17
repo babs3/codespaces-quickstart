@@ -30,6 +30,7 @@ pipeline:
 - name: EntitySynonymMapper
 - name: ResponseSelector # for FAQ and chitchat interruptions
   epochs: 100
+- name: NLUCommandAdapter
   
 # # No configuration for the NLU pipeline was provided. The following default pipeline was used to train your model.
 # # If you'd like to customize it, uncomment and adjust the pipeline.

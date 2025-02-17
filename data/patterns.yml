@@ -20,3 +20,15 @@ flows:
       - intent: session_start
     steps:
       - action: utter_greet
+
+  pattern_cancel_flow:
+    description: Conversation repair flow that starts when a flow is cancelled
+    name: pattern_cancel_flow
+    nlu_trigger:
+      - intent:
+          name: cancel
+          confidence_threshold: 0.5
+    steps:
+      - action: action_cancel_flow
+      - action: action_clean_stack
+      - action: utter_flow_cancelled_rasa
