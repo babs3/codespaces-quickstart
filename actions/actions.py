@@ -55,18 +55,22 @@ class ActionFetchClassMaterial(Action):
         print("\n✏️  max_score: " + str(max_score))
         #normalized_scores = [(1 - (score / max_score)) for score in scores]  # Convert to similarity (higher is better)
 
-        # Set a dynamic score threshold (e.g., retrieve pages with at least 80% of max relevance)
-        threshold = 0.8 * max_score  
-        print("🧻 Threshold: " + str(threshold))
+        # Set an adaptive threshold: Consider the spread of relevance scores
+        score_mean = np.mean(scores)
+        score_std = np.std(scores)
+
+        # Dynamic threshold based on standard deviation
+        threshold = max(score_mean + 0.5 * score_std, 0.7 * max_score)  # Keep at least 70% of max score
+        print(f"🧻 Adaptive Threshold: {threshold:.4f}")
+
+        # Select relevant results based on the adaptive threshold
         selected_results = [
             (documents[i], metadata[i], scores[i])
             for i in range(len(scores))
-            if scores[i] >= threshold  # Keep only relevant results
+            if scores[i] >= threshold  # Keep only highly relevant results
         ]
 
-        # Ensure at least 1 result is returned
         if len(selected_results) == 0:
-        #    selected_results = [(documents[0], metadata[0], scores[0])]
             dispatcher.utter_message(text="I couldn't find relevant class materials for your query.")
             print("\n🚨 No relevant materials found!")
         else: 
@@ -86,7 +90,6 @@ class ActionFetchClassMaterial(Action):
         if results_text:
             # Prepare final text for Gemini
             raw_text = "\n".join(results_text)
-            #prompt = f"Summarize this educational content and make it more readable for students. Keep the PDF name and page numbers clear: \n{raw_text}."
             prompt = f"Use the following raw educational content to answer the student query: '{query}'. Make the provided content more readable to the student and don't forget to mention the PDF name and page numbers where the student could find more information: \n{raw_text} "
             print("\n📢 Sending to Gemini API for Summarization...")
             print(f"🔹 Prompt: {prompt[:500]}...")  # Show only first 500 chars for readability
