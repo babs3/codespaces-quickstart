@@ -32,7 +32,7 @@ class ActionFetchClassMaterial(Action):
 
     def run(self, dispatcher, tracker, domain):
         query = tracker.latest_message.get("text")  # Get user query
-        print(f"🧒 User query: {query}")
+        print(f"🧒 User query: '{query}'")
         query_embedding = model.encode(query, convert_to_numpy=True).tolist()  # ✅ Ensure it's 1D
 
         # Search in ChromaDB - Get top 10 candidates
