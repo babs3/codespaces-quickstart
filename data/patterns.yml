@@ -22,3 +22,11 @@ flows:
     name: pattern forbidden topics
     steps:
       - action: utter_restricted_topic_warning
+
+  pattern_session_start:
+    description: Flow for starting the conversation
+    name: pattern session start
+    nlu_trigger:
+      - intent: session_start
+    steps:
+      - action: utter_greet

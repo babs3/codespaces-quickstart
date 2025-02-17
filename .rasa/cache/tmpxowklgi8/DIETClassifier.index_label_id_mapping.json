@@ -1,0 +1,12 @@
+{
+  "0": "affirm",
+  "1": "ask_forbidden_topics",
+  "2": "ask_question",
+  "3": "bot_challenge",
+  "4": "chitchat",
+  "5": "deny",
+  "6": "goodbye",
+  "7": "greet",
+  "8": "mood_great",
+  "9": "mood_unhappy"
+}
