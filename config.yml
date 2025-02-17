@@ -16,7 +16,7 @@ pipeline:
   llm:
     model_group: rasa_command_generation_model
   flow_retrieval:
-    active: false
+    active: false # if true I get 'insufficient_quota'
 - name: WhitespaceTokenizer
 - name: RegexFeaturizer
 - name: LexicalSyntacticFeaturizer
@@ -26,10 +26,12 @@ pipeline:
   min_ngram: 1
   max_ngram: 4
 - name: DIETClassifier
-  epochs: 10 #100
+  epochs: 100
+  constrain_similarities: true
 - name: EntitySynonymMapper
 - name: ResponseSelector # for FAQ and chitchat interruptions
   epochs: 100
+  constrain_similarities: true
 - name: NLUCommandAdapter
   
 # # No configuration for the NLU pipeline was provided. The following default pipeline was used to train your model.

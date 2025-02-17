@@ -7,10 +7,10 @@ flows:
 
   pattern_search:
     description: Handle general knowledge questions that are relevant to learning.
-    name: pattern general knowledge
+    name: pattern fetch class material
     steps:
-      - action: action_answer_general_question
-
+      - action: action_fetch_class_material #action_answer_general_question
+        next: END
       
   # seems not to work...    
   pattern_session_start:

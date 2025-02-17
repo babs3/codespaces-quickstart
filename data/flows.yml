@@ -1,21 +1,22 @@
 flows:
-  ask_question:
-    description: Help users get class doubts explained.
-    steps:
-      - id: "start"
-        collect: user_query
-        description: "what the user want to be answered"
-        ask_before_filling: true
-      - action: action_fetch_class_material
-      - collect: more_questions
-        description: "ask the user if he has more questions"
-        ask_before_filling: true
-        next:
-        - if: not slots.more_questions
-          then:
-            - action: utter_ok
-              next: END
-        - else: "start"
+
+  #ask_question:
+  #  description: Help users get class doubts explained.
+  #  steps:
+  #    - id: "start"
+  #      collect: user_query
+  #      description: "what the user want to be answered"
+  #      ask_before_filling: true
+  #    - action: action_fetch_class_material
+  #    - collect: more_questions
+  #      description: "ask the user if he has more questions"
+  #      ask_before_filling: true
+  #      next:
+  #      - if: not slots.more_questions
+  #        then:
+  #          - action: utter_ok
+  #            next: END
+  #      - else: "start"
   
   greet:
     description: Greet the user.

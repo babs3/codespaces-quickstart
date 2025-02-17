@@ -1,17 +1,17 @@
 version: "3.1"
 
 intents:
-  - greet
-  - goodbye
-  - affirm
-  - deny
+  - greet # not used yet
+  - goodbye # not used yet
+  - affirm # not used yet
+  - deny # not used yet
   - mood_great
-  - mood_unhappy
-  - bot_challenge
-  - ask_question
-  - ask_another_question
-  - ask_forbidden_topics
+  - mood_unhappy # not used yet
+  - bot_challenge # not used yet
+  - ask_question # not used yet
+  - ask_forbidden_topics # not used yet
   - chitchat
+  - cancel
 
 slots:
   user_query:
@@ -76,7 +76,7 @@ responses:
 
 actions:
   - action_fetch_class_material
-  - action_answer_general_question
+  #- action_answer_general_question
 
 session_config:
   session_expiration_time: 60
