@@ -15,6 +15,7 @@ from sentence_transformers import SentenceTransformer
 from rank_bm25 import BM25Okapi
 import pickle
 import os
+import spacy
 
 # Load sentence transformer model
 model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -31,6 +32,15 @@ collection = chroma_client.get_collection(name="class_materials")
 with open("vector_store/bm25_index.pkl", "rb") as f:
     bm25_index, bm25_metadata, bm25_documents = pickle.load(f)
 
+
+nlp = spacy.load("en_core_web_sm")
+
+def tokenize(query):
+    doc = nlp(query.lower())
+    tokens = [token.text for token in doc if token.is_alpha and not token.is_stop]
+    return tokens
+
+# === ACTION 1: FETCH RAW MATERIAL === #
 class ActionFetchClassMaterial(Action):
     def name(self):
         return "action_fetch_class_material"
@@ -48,7 +58,7 @@ class ActionFetchClassMaterial(Action):
         vector_scores = vector_results["distances"][0]  # Lower is better (L2 distance)
 
         # === SPARSE (BM25) SEARCH === #
-        query_tokens = query.lower().split()
+        query_tokens = tokenize(query)
         bm25_scores = bm25_index.get_scores(query_tokens)
         top_bm25_indices = np.argsort(bm25_scores)[::-1][:20]  # Top 20 results
 
@@ -82,18 +92,9 @@ class ActionFetchClassMaterial(Action):
         # === ADAPTIVE THRESHOLDING BASED ON PERCENTILE === #
         scores = [score for _, _, score in hybrid_results]
         max_score = max(scores) if scores else 1
-        score_mean = np.mean(scores)
-        score_std = np.std(scores)
+        adaptive_threshold = max(np.mean(scores) + 0.5 * np.std(scores), np.percentile(scores, 80), 0.7 * max_score)
 
-        # Alternative 1: Dynamic thresholding based on percentiles
-        percentile_80 = np.percentile(scores, 80) if scores else 0  # Selects the top 20% most relevant results
-
-        # Alternative 2:
-        adaptive_threshold = max(score_mean + 0.5 * score_std, percentile_80, 0.7 * max_score)  # Keep at least 70% of max score
-
-        print(f"\n📊 Adaptive Threshold: {score_mean + 0.5 * score_std:.3f}, Percentile_80 Threshold: {percentile_80:.3f}, Max Score Threshold: {0.7 * max_score:.3f} \nFinal Threshold => {adaptive_threshold:.3f}")
-
-        # Filter results based on PERCENTILE as threshold
+        # Filter results
         selected_results = [(doc, meta, score) for doc, meta, score in hybrid_results if score >= adaptive_threshold]
 
         if len(selected_results) == 0:
@@ -115,25 +116,73 @@ class ActionFetchClassMaterial(Action):
 
             # === PREPARE QUERY FOR GEMINI === #
             raw_text = "\n".join(results_text)
-            prompt = f"Use the following raw educational content to answer the student query: '{query}'. Make the provided content more readable to the student and don't forget to mention the PDF name and page numbers where the student could find more information: \n{raw_text} "
+            prompt = f"Use the following raw educational content to answer the student query: '{query}'. Make the provided content more readable to the student: \n{raw_text} "
 
             print("\n📢 Sending to Gemini API for Summarization...")
             print(f"🔹 Prompt: {prompt[:500]}...")  # Show only first 500 chars for readability
 
             try:
-                # Call Gemini API
                 g_model = genai.GenerativeModel("gemini-pro")
                 response = g_model.generate_content(prompt)
 
-                # ✅ Extract response text correctly
                 if hasattr(response, "text") and response.text:
                     print("\n🎯 Gemini Response Generated Successfully!")
                     dispatcher.utter_message(text=response.text)
                 else:
-                    dispatcher.utter_message(text="Sorry, I couldn't generate a response.")
                     print("\n⚠️ Gemini Response is empty.")
+                    dispatcher.utter_message(text="Sorry, I couldn't generate a response.")
             except Exception as e:
                 dispatcher.utter_message(text="Sorry, I couldn't process that request.")
                 print(f"\n❌ Error calling Gemini API: {e}")
+
+            # Call the new action for material location
+            ActionGetClassMaterialLocation().run(dispatcher, tracker, domain)
+
+        return []
+
+
+import spacy
+
+nlp = spacy.load("en_core_web_sm")
+
+# === ACTION 2: GET PDF NAMES & PAGE LOCATIONS === #
+class ActionGetClassMaterialLocation(Action):
+    def name(self):
+        return "action_get_class_material_location"
+
+    def run(self, dispatcher, tracker, domain):
+        query = tracker.latest_message.get("text")  
+
+        query_tokens = tokenize(query)  # Extract meaningful keywords
+        print(f"\n📖 Finding exact material location for query tokens: '{query_tokens}'")
+    
+        bm25_scores = bm25_index.get_scores(query_tokens)
+        top_indices = np.argsort(bm25_scores)[::-1][:10]  # Top 10 matches
+
+        location_results = []
+        
+        for i in top_indices:
+            file_name = bm25_metadata[i]["file"]
+            page_number = bm25_metadata[i]["page"]
+            document_text = bm25_documents[i]
+
+            # Tokenize the document text (same as BM25)
+            document_tokens = tokenize(document_text)  
+
+            append = True
+            for token in query_tokens:
+                if token not in document_tokens:
+                    append = False
+                    break
+            if append:
+                location_results.append(f"📄 **{file_name} (Page {page_number})**")
+
+        if location_results:
+            #print("\n🔎 Selected Documents and Their Tokens:\n")
+            print("\n🎯 Material location for query found!")
+            dispatcher.utter_message(text="You can find more information in:\n" + "\n".join(location_results))
+        else:
+            print("\n⚠️ No references to student query related materials found.")
+            dispatcher.utter_message(text="I couldn't find specific page references, but check related PDFs.")
 
         return []
