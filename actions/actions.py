@@ -15,6 +15,7 @@ from sentence_transformers import SentenceTransformer
 from rank_bm25 import BM25Okapi
 import pickle
 import os
+import re
 import spacy
 
 # Load sentence transformer model
@@ -32,13 +33,29 @@ collection = chroma_client.get_collection(name="class_materials")
 with open("vector_store/bm25_index.pkl", "rb") as f:
     bm25_index, bm25_metadata, bm25_documents = pickle.load(f)
 
-
 nlp = spacy.load("en_core_web_sm")
 
 def tokenize(query):
     doc = nlp(query.lower())
     tokens = [token.text for token in doc if token.is_alpha and not token.is_stop]
     return tokens
+
+def extract_keywords(query):
+    """Extracts only meaningful subject keywords from a query."""
+    doc = nlp(query.lower())  # Process query with NLP model
+    keywords = []
+
+    #for chunk in doc.noun_chunks:  # Extract noun phrases
+    #    if len(chunk.text.split()) > 1:  # Keep multi-word terms (e.g., "DuPont Analysis")
+    #        keywords.append(chunk.text)
+
+    for token in doc:  # Extract single important words
+        if token.pos_ in {"NOUN", "PROPN"} and not token.is_stop:
+            keywords.append(token.text)
+
+    # Remove duplicates while preserving order
+    keywords = list(dict.fromkeys(keywords))  
+    return keywords
 
 # === ACTION 1: FETCH RAW MATERIAL === #
 class ActionFetchClassMaterial(Action):
@@ -93,6 +110,7 @@ class ActionFetchClassMaterial(Action):
         scores = [score for _, _, score in hybrid_results]
         max_score = max(scores) if scores else 1
         adaptive_threshold = max(np.mean(scores) + 0.5 * np.std(scores), np.percentile(scores, 80), 0.7 * max_score)
+        print(f"\n📊 Adaptive Threshold: {np.mean(scores) + 0.5 * np.std(scores):.3f}, Percentile_80 Threshold: {np.percentile(scores, 80):.3f}, Max Score Threshold: {0.7 * max_score:.3f} \nFinal Threshold => {adaptive_threshold:.3f}")
 
         # Filter results
         selected_results = [(doc, meta, score) for doc, meta, score in hybrid_results if score >= adaptive_threshold]
@@ -119,7 +137,7 @@ class ActionFetchClassMaterial(Action):
             prompt = f"Use the following raw educational content to answer the student query: '{query}'. Make the provided content more readable to the student: \n{raw_text} "
 
             print("\n📢 Sending to Gemini API for Summarization...")
-            print(f"🔹 Prompt: {prompt[:500]}...")  # Show only first 500 chars for readability
+            print(f"🔹 Prompt: {prompt[:300]}...")  # Show only first 300 chars for readability
 
             try:
                 g_model = genai.GenerativeModel("gemini-pro")
@@ -140,11 +158,6 @@ class ActionFetchClassMaterial(Action):
 
         return []
 
-
-import spacy
-
-nlp = spacy.load("en_core_web_sm")
-
 # === ACTION 2: GET PDF NAMES & PAGE LOCATIONS === #
 class ActionGetClassMaterialLocation(Action):
     def name(self):
@@ -153,21 +166,23 @@ class ActionGetClassMaterialLocation(Action):
     def run(self, dispatcher, tracker, domain):
         query = tracker.latest_message.get("text")  
 
-        query_tokens = tokenize(query)  # Extract meaningful keywords
+        #query_tokens = tokenize(query)  # Extract meaningful keywords
+        query_tokens = extract_keywords(query)  # Use improved keyword extraction
         print(f"\n📖 Finding exact material location for query tokens: '{query_tokens}'")
     
         bm25_scores = bm25_index.get_scores(query_tokens)
         top_indices = np.argsort(bm25_scores)[::-1][:10]  # Top 10 matches
 
         location_results = []
-        
+        document_entries = []  # Store documents before sorting
+
         for i in top_indices:
             file_name = bm25_metadata[i]["file"]
             page_number = bm25_metadata[i]["page"]
             document_text = bm25_documents[i]
 
             # Tokenize the document text (same as BM25)
-            document_tokens = tokenize(document_text)  
+            document_tokens = extract_keywords(document_text) #tokenize
 
             append = True
             for token in query_tokens:
@@ -175,14 +190,22 @@ class ActionGetClassMaterialLocation(Action):
                     append = False
                     break
             if append:
-                location_results.append(f"📄 **{file_name} (Page {page_number})**")
+                document_entries.append((file_name, page_number))
+
+        # **Sort by PDF name (A-Z) and then by page number (ascending)**
+        document_entries.sort(key=lambda x: (x[0].lower(), x[1]))  
+
+        # Format results
+        location_results = [f"📄 **{entry[0]} (Page {entry[1]})**" for entry in document_entries]
 
         if location_results:
-            #print("\n🔎 Selected Documents and Their Tokens:\n")
             print("\n🎯 Material location for query found!")
+            #print("\n📌 FINAL SORTED RESULTS:")
+            #for result in location_results:
+            #    print(result)
             dispatcher.utter_message(text="You can find more information in:\n" + "\n".join(location_results))
         else:
-            print("\n⚠️ No references to student query related materials found.")
+            print("\n⚠️  No references to student query related materials found.")
             dispatcher.utter_message(text="I couldn't find specific page references, but check related PDFs.")
 
         return []
