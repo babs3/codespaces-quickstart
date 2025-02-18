@@ -41,7 +41,7 @@ class ActionFetchClassMaterial(Action):
 
         # === DENSE (Vector) SEARCH === #
         query_embedding = model.encode(query, convert_to_numpy=True).tolist()
-        vector_results = collection.query(query_embeddings=[query_embedding], n_results=10)
+        vector_results = collection.query(query_embeddings=[query_embedding], n_results=20)
 
         vector_docs = vector_results["documents"][0]
         vector_metadata = vector_results["metadatas"][0]
@@ -50,7 +50,7 @@ class ActionFetchClassMaterial(Action):
         # === SPARSE (BM25) SEARCH === #
         query_tokens = query.lower().split()
         bm25_scores = bm25_index.get_scores(query_tokens)
-        top_bm25_indices = np.argsort(bm25_scores)[::-1][:10]  # Top 10 results
+        top_bm25_indices = np.argsort(bm25_scores)[::-1][:20]  # Top 20 results
 
         bm25_docs = [bm25_documents[i] for i in top_bm25_indices]
         bm25_metadata_selected = [bm25_metadata[i] for i in top_bm25_indices]
@@ -81,13 +81,20 @@ class ActionFetchClassMaterial(Action):
 
         # === ADAPTIVE THRESHOLDING BASED ON PERCENTILE === #
         scores = [score for _, _, score in hybrid_results]
-        percentile_cutoff = 70  # Retrieve top 30% of most relevant results
-        threshold = np.percentile(scores, percentile_cutoff)  # Set threshold at top 30% of results
+        max_score = max(scores) if scores else 1
+        score_mean = np.mean(scores)
+        score_std = np.std(scores)
 
-        print(f"📊 Using {percentile_cutoff}th Percentile as Threshold: {threshold:.4f}")
+        # Alternative 1: Dynamic thresholding based on percentiles
+        percentile_80 = np.percentile(scores, 80) if scores else 0  # Selects the top 20% most relevant results
+
+        # Alternative 2:
+        adaptive_threshold = max(score_mean + 0.5 * score_std, percentile_80, 0.7 * max_score)  # Keep at least 70% of max score
+
+        print(f"\n📊 Adaptive Threshold: {score_mean + 0.5 * score_std:.3f}, Percentile_80 Threshold: {percentile_80:.3f}, Max Score Threshold: {0.7 * max_score:.3f} \nFinal Threshold => {adaptive_threshold:.3f}")
 
         # Filter results based on PERCENTILE as threshold
-        selected_results = [(doc, meta, score) for doc, meta, score in hybrid_results if score >= threshold]
+        selected_results = [(doc, meta, score) for doc, meta, score in hybrid_results if score >= adaptive_threshold]
 
         if len(selected_results) == 0:
             dispatcher.utter_message(text="I couldn't find relevant class materials for your query.")
