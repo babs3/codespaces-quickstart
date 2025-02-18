@@ -4,7 +4,6 @@
 # See this guide on how to implement these action:
 # https://rasa.com/docs/rasa-pro/concepts/custom-actions
 
-
 import sys
 sys.modules["sqlite3"] = __import__("pysqlite3")
 import chromadb
@@ -13,6 +12,8 @@ import google.generativeai as genai
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 from sentence_transformers import SentenceTransformer
+from rank_bm25 import BM25Okapi
+import pickle
 import os
 
 # Load sentence transformer model
@@ -26,6 +27,10 @@ VECTOR_DB_PATH = "vector_store"
 chroma_client = chromadb.PersistentClient(path=VECTOR_DB_PATH)
 collection = chroma_client.get_collection(name="class_materials")
 
+# Load BM25 index
+with open("vector_store/bm25_index.pkl", "rb") as f:
+    bm25_index, bm25_metadata, bm25_documents = pickle.load(f)
+
 class ActionFetchClassMaterial(Action):
     def name(self):
         return "action_fetch_class_material"
@@ -33,42 +38,56 @@ class ActionFetchClassMaterial(Action):
     def run(self, dispatcher, tracker, domain):
         query = tracker.latest_message.get("text")  # Get user query
         print(f"🧒 User query: '{query}'")
-        query_embedding = model.encode(query, convert_to_numpy=True).tolist()  # ✅ Ensure it's 1D
 
-        # Search in ChromaDB - Get top 10 candidates
-        search_results = collection.query(
-            query_embeddings=[query_embedding],
-            n_results=10  # Retrieve more pages first
-        )
+        # === DENSE (Vector) SEARCH === #
+        query_embedding = model.encode(query, convert_to_numpy=True).tolist()
+        vector_results = collection.query(query_embeddings=[query_embedding], n_results=10)
 
-        # Extract scores and metadata
-        scores = search_results["distances"][0]  # Similarity scores for retrieved pages
-        documents = search_results["documents"][0]  # Retrieved text chunks
-        metadata = search_results["metadatas"][0]  # Metadata (file names, pages)
+        vector_docs = vector_results["documents"][0]
+        vector_metadata = vector_results["metadatas"][0]
+        vector_scores = vector_results["distances"][0]  # Lower is better (L2 distance)
 
-        #print("\n🔍 Retrieved Results from ChromaDB:")
-        #for i, (doc, meta, score) in enumerate(zip(documents, metadata, scores)):
-        #    print(f"{i+1}. PDF: {meta['file']} | Page: {meta.get('page', 'unknown')} | Score: {score:.4f}")
+        # === SPARSE (BM25) SEARCH === #
+        query_tokens = query.lower().split()
+        bm25_scores = bm25_index.get_scores(query_tokens)
+        top_bm25_indices = np.argsort(bm25_scores)[::-1][:10]  # Top 10 results
 
-        # Normalize scores (FAISS distances are L2 distances, so we convert to similarity)
-        max_score = max(scores) if scores else 1  # Avoid division by zero
-        print("\n✏️  max_score: " + str(max_score))
-        #normalized_scores = [(1 - (score / max_score)) for score in scores]  # Convert to similarity (higher is better)
+        bm25_docs = [bm25_documents[i] for i in top_bm25_indices]
+        bm25_metadata_selected = [bm25_metadata[i] for i in top_bm25_indices]
+        bm25_scores_selected = [bm25_scores[i] for i in top_bm25_indices]
 
-        # Set an adaptive threshold: Consider the spread of relevance scores
-        score_mean = np.mean(scores)
-        score_std = np.std(scores)
+        # === NORMALIZE SCORES === #
+        max_vec_score = max(vector_scores) if vector_scores else 1
+        vector_scores = [1 - (score / max_vec_score) for score in vector_scores]  # Convert L2 to similarity
 
-        # Dynamic threshold based on standard deviation
-        threshold = max(score_mean + 0.5 * score_std, 0.7 * max_score)  # Keep at least 70% of max score
-        print(f"🧻 Adaptive Threshold: {threshold:.4f}")
+        max_bm25_score = max(bm25_scores_selected) if bm25_scores_selected else 1
+        bm25_scores_selected = [score / max_bm25_score for score in bm25_scores_selected]  # Normalize BM25 scores
 
-        # Select relevant results based on the adaptive threshold
-        selected_results = [
-            (documents[i], metadata[i], scores[i])
-            for i in range(len(scores))
-            if scores[i] >= threshold  # Keep only highly relevant results
-        ]
+        # === MERGE & RE-RANK RESULTS === #
+        hybrid_results = []
+        alpha = 0.7  # Balance factor between vector & keyword search
+
+        for doc, meta, score in zip(vector_docs, vector_metadata, vector_scores):
+            hybrid_score = alpha * score + (1 - alpha) * 0  # BM25 score unavailable for vectors
+            hybrid_results.append((doc, meta, hybrid_score))
+
+        alpha = 0.3 
+        for doc, meta, score in zip(bm25_docs, bm25_metadata_selected, bm25_scores_selected):
+            hybrid_score = alpha * 0 + (1 - alpha) * score  # Vector score unavailable for BM25
+            hybrid_results.append((doc, meta, hybrid_score))
+
+        # Sort results by hybrid score
+        hybrid_results = sorted(hybrid_results, key=lambda x: x[2], reverse=True)
+
+        # === ADAPTIVE THRESHOLDING BASED ON PERCENTILE === #
+        scores = [score for _, _, score in hybrid_results]
+        percentile_cutoff = 70  # Retrieve top 30% of most relevant results
+        threshold = np.percentile(scores, percentile_cutoff)  # Set threshold at top 30% of results
+
+        print(f"📊 Using {percentile_cutoff}th Percentile as Threshold: {threshold:.4f}")
+
+        # Filter results based on PERCENTILE as threshold
+        selected_results = [(doc, meta, score) for doc, meta, score in hybrid_results if score >= threshold]
 
         if len(selected_results) == 0:
             dispatcher.utter_message(text="I couldn't find relevant class materials for your query.")
@@ -77,20 +96,20 @@ class ActionFetchClassMaterial(Action):
             print("\n✅ Selected Pages After Filtering:")
             idx = 1
             for doc, meta, score in selected_results:
-                print(f"{idx}. 📄 PDF: {meta['file']} | Page: {meta.get('page', 'unknown')} | Score: {score:.4f}")
+                print(f"{idx}. 📄 PDF: {meta['file']} | Page: {meta['page']} | Score: {score:.4f}")
                 idx += 1
 
             # Format results
             results_text = []
             for text_chunk, meta, score in selected_results:
                 file_name = meta["file"]
-                page_number = meta["page"] if "page" in meta else "unknown"
+                page_number = meta["page"]
                 results_text.append(f"📄 **From {file_name} (Page {page_number})**:\n{text_chunk}")
 
-        if results_text:
-            # Prepare final text for Gemini
+            # === PREPARE QUERY FOR GEMINI === #
             raw_text = "\n".join(results_text)
             prompt = f"Use the following raw educational content to answer the student query: '{query}'. Make the provided content more readable to the student and don't forget to mention the PDF name and page numbers where the student could find more information: \n{raw_text} "
+
             print("\n📢 Sending to Gemini API for Summarization...")
             print(f"🔹 Prompt: {prompt[:500]}...")  # Show only first 500 chars for readability
 
@@ -111,4 +130,3 @@ class ActionFetchClassMaterial(Action):
                 print(f"\n❌ Error calling Gemini API: {e}")
 
         return []
-
