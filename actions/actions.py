@@ -17,6 +17,15 @@ import pickle
 import os
 import re
 import spacy
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
+
+# Define known synonyms (expand this list over time)
+SYNONYM_MAP = {
+    "framework": ["analysis", "model", "methodology"],
+    "evaluation": ["assessment", "review"],
+    "financial ratios": ["accounting ratios"]
+}
 
 # Load sentence transformer model
 model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -40,22 +49,81 @@ def tokenize(query):
     tokens = [token.text for token in doc if token.is_alpha and not token.is_stop]
     return tokens
 
+# === STEP 1: MULTI-WORD EXPRESSION (MWE) EXTRACTION === #
+import spacy
+
+nlp = spacy.load("en_core_web_sm")
+
 def extract_keywords(query):
     """Extracts only meaningful subject keywords from a query."""
     doc = nlp(query.lower())  # Process query with NLP model
     keywords = []
+    single_word_tokens = set()  # Store individual words temporarily
 
-    #for chunk in doc.noun_chunks:  # Extract noun phrases
-    #    if len(chunk.text.split()) > 1:  # Keep multi-word terms (e.g., "DuPont Analysis")
-    #        keywords.append(chunk.text)
+    # Extract noun phrases (multi-word terms)
+    for chunk in doc.noun_chunks:
+        keyword = chunk.text.strip()
+        if len(keyword.split()) > 1:  # Only keep multi-word phrases
+            keywords.append(keyword)
+            single_word_tokens.update(keyword.split())  # Store individual words to avoid later
 
-    for token in doc:  # Extract single important words
+    # Extract single meaningful words (NOUN, PROPN) **if not part of a noun phrase**
+    for token in doc:
         if token.pos_ in {"NOUN", "PROPN"} and not token.is_stop:
-            keywords.append(token.text)
+            if token.text not in single_word_tokens:  # Exclude if part of a noun phrase
+                keywords.append(token.text)
 
     # Remove duplicates while preserving order
-    keywords = list(dict.fromkeys(keywords))  
+    keywords = list(dict.fromkeys(keywords))
     return keywords
+
+
+# === STEP 2: EXPAND SYNONYMS === #
+from itertools import product
+
+# === STEP 2: EXPAND SYNONYMS === #
+def expand_query_with_synonyms(query_expressions):
+    """Expand expressions with their known synonyms, preserving multi-word structure."""
+    expanded_queries = set()
+
+    for expr in query_expressions:
+        words = expr.split()  # Split phrase into individual words
+        synonym_options = []
+
+        for word in words:
+            if word in SYNONYM_MAP:
+                synonym_options.append([word] + SYNONYM_MAP[word])  # Include original word + synonyms
+            else:
+                synonym_options.append([word])  # Keep the word unchanged
+
+        # Generate all possible replacements (cartesian product)
+        for combination in product(*synonym_options):
+            expanded_queries.add(" ".join(combination))  # Rebuild phrase
+
+    return list(expanded_queries)
+
+
+# === STEP 3: SPELL CORRECTION === #
+def correct_misspellings(query_expressions, document_terms, threshold=80):
+    """Corrects potential spelling errors using fuzzy matching."""
+    corrected = []
+    for expr in query_expressions:
+        best_match, score = process.extractOne(expr, document_terms)
+        if score >= threshold:
+            corrected.append(best_match)
+        else:
+            corrected.append(expr)
+    return corrected
+
+# === STEP 4: DOCUMENT FILTERING BASED ON MWE PRESENCE === #
+def document_contains_expression(doc_text, expressions, threshold=85):
+    """Ensures that at least one key expression exists in the document."""
+    for expr in expressions:
+        for sentence in doc_text.split("."):  # Check each sentence separately
+            if fuzz.token_set_ratio(expr.lower(), sentence.lower()) >= threshold:
+                return True
+    return False
+
 
 # === ACTION 1: FETCH RAW MATERIAL === #
 class ActionFetchClassMaterial(Action):
@@ -76,6 +144,8 @@ class ActionFetchClassMaterial(Action):
 
         # === SPARSE (BM25) SEARCH === #
         query_tokens = tokenize(query)
+        print(f"\n📖 Getting bm25_scores for tokens: {query_tokens}")
+
         bm25_scores = bm25_index.get_scores(query_tokens)
         top_bm25_indices = np.argsort(bm25_scores)[::-1][:20]  # Top 20 results
 
@@ -158,6 +228,34 @@ class ActionFetchClassMaterial(Action):
 
         return []
 
+
+# Function to check if any query token loosely matches document tokens
+def fuzzy_match(query_tokens, document_tokens, threshold=80):
+    for query_token in query_tokens:
+        for doc_token in document_tokens:
+            if fuzz.token_set_ratio(query_token.lower(), doc_token.lower()) >= threshold:
+                print(f"\n✅ Match found! Token: '{query_token}'.")
+                print(f"📄 Context: {' '.join(document_tokens)}")  # Print full document tokens for debugging
+                return True  # If any match is found, return True
+    return False
+
+def extract_simple_tokens(query):
+    """Extracts only meaningful single-word tokens from a query (excluding stopwords & phrases)."""
+    doc = nlp(query.lower())  # Process query with NLP model
+    keywords = []
+    
+    for token in doc:
+        if token.pos_ in {"NOUN", "PROPN"} and not token.is_stop:
+            keywords.append(token.text)
+
+        # Include adjectives that appear **before** a noun (e.g., "financial management")
+        elif token.pos_ == "ADJ" and token.dep_ in {"amod", "compound"}:
+            keywords.append(token.text)
+
+    # Remove duplicates while preserving order
+    keywords = list(dict.fromkeys(keywords))
+    return keywords
+
 # === ACTION 2: GET PDF NAMES & PAGE LOCATIONS === #
 class ActionGetClassMaterialLocation(Action):
     def name(self):
@@ -166,12 +264,39 @@ class ActionGetClassMaterialLocation(Action):
     def run(self, dispatcher, tracker, domain):
         query = tracker.latest_message.get("text")  
 
-        #query_tokens = tokenize(query)  # Extract meaningful keywords
-        query_tokens = extract_keywords(query)  # Use improved keyword extraction
-        print(f"\n📖 Finding exact material location for query tokens: '{query_tokens}'")
-    
-        bm25_scores = bm25_index.get_scores(query_tokens)
+        query_tokens = extract_simple_tokens(query)  # Extract meaningful keywords
+        expanded_tokens = expand_query_with_synonyms(query_tokens)  # Expand with synonyms
+        print(f"\n📖 Finding material location for: {query_tokens}")
+        print(f"🔄 Expanded keywords with synonyms: {expanded_tokens}")
+
+        # Collect all unique words from BM25 documents to compare for spell correction
+        all_document_tokens = set()
+        for doc_text in bm25_documents:
+            all_document_tokens.update(extract_simple_tokens(doc_text))
+
+        # Correct potential misspellings in the student query
+        corrected_tokens = correct_misspellings(expanded_tokens, list(all_document_tokens))
+        print(f"✅ Corrected Tokens After Spell Check: {corrected_tokens}")
+
+        # Perform BM25 search
+        bm25_scores = bm25_index.get_scores(corrected_tokens) # tem de ser dos tokens individuais
         top_indices = np.argsort(bm25_scores)[::-1][:10]  # Top 10 matches
+
+        print('_'*100)
+
+        query_tokens = extract_keywords(query)  # Extract meaningful keywords
+        expanded_tokens = expand_query_with_synonyms(query_tokens)  # Expand with synonyms
+        print(f"\n📖 Finding material location for: {query_tokens}")
+        print(f"🔄 Expanded keywords with synonyms: {expanded_tokens}")
+
+        # Collect all unique words from BM25 documents to compare for spell correction
+        all_document_tokens = set()
+        for doc_text in bm25_documents:
+            all_document_tokens.update(extract_keywords(doc_text))
+
+        # Correct potential misspellings in the student query
+        #corrected_tokens = correct_misspellings(expanded_tokens, list(all_document_tokens))
+        print(f"✅ Corrected Tokens After Spell Check: {expanded_tokens}")
 
         location_results = []
         document_entries = []  # Store documents before sorting
@@ -181,16 +306,20 @@ class ActionGetClassMaterialLocation(Action):
             page_number = bm25_metadata[i]["page"]
             document_text = bm25_documents[i]
 
-            # Tokenize the document text (same as BM25)
-            document_tokens = extract_keywords(document_text) #tokenize
+            # Tokenize the document text
+            document_tokens = extract_keywords(document_text)
 
-            append = True
-            for token in query_tokens:
-                if token not in document_tokens:
-                    append = False
-                    break
-            if append:
+            # Perform fuzzy matching -> solves matches like 'external environment analysis\npestel analysis'
+            if fuzzy_match(expanded_tokens, document_tokens):
                 document_entries.append((file_name, page_number))
+
+            #for token in corrected_tokens:
+            #    if token in document_tokens:
+            #        print(f"✅ Match found! Token: '{token}' in document: '{file_name}' (Page {page_number})")
+            #        print(f"📄 Context: {' '.join(document_tokens)}")  # Print full document tokens for debugging
+            #        document_entries.append((file_name, page_number))
+            #        break  # Stop after the first match
+
 
         # **Sort by PDF name (A-Z) and then by page number (ascending)**
         document_entries.sort(key=lambda x: (x[0].lower(), x[1]))  
@@ -200,12 +329,12 @@ class ActionGetClassMaterialLocation(Action):
 
         if location_results:
             print("\n🎯 Material location for query found!")
-            #print("\n📌 FINAL SORTED RESULTS:")
-            #for result in location_results:
-            #    print(result)
+            print("\n📌 FINAL SORTED RESULTS:")
+            for result in location_results:
+                print(result)
             dispatcher.utter_message(text="You can find more information in:\n" + "\n".join(location_results))
         else:
-            print("\n⚠️  No references to student query related materials found.")
+            print("\n⚠️  No exact references found, but you might check related PDFs.")
             dispatcher.utter_message(text="I couldn't find specific page references, but check related PDFs.")
 
         return []
