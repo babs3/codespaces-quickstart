@@ -111,7 +111,7 @@ def correct_spelling(word, set):
     """Corrects spelling by finding the closest valid match."""
     closest_match = get_close_matches(word, set, n=1, cutoff=0.8)  # 80% similarity threshold
     if closest_match:
-        print(f"    - 🐟 best match for '{word}': {closest_match[0]}; {closest_match}")
+        print(f"    - 🐟 best match for '{word}': {closest_match[0]}")
     return closest_match[0] if closest_match else word  # Return the match or original word
 
 # === SPELL CHECK WRAPPER === #
@@ -266,14 +266,14 @@ def fuzzy_match(query_tokens, document_tokens, threshold=95):
     for query_token in query_tokens:
         if " " in query_token:  # If query token is a phrase (e.g., "pestel framework")
             if query_token in doc_text:  # Check if entire phrase appears in doc
-                print(f"\n✅ Exact phrase match found! Token: '{query_token}'")
-                print(f"📄 Context: {doc_text[:500]}")  # Print first 500 chars for debugging
+                #print(f"\n✅ Exact phrase match found! Token: '{query_token}'")
+                #print(f"📄 Context: {doc_text[:500]}")  # Print first 500 chars for debugging
                 return True
         else:  # If single word, apply fuzzy matching
             for doc_token in document_tokens:
                 if fuzz.token_set_ratio(query_token, doc_token) >= threshold:
-                    print(f"\n✅ Match found! Token: '{query_token}' in '{doc_token}'.")
-                    print(f"📄 Context: {doc_text[:500]}")
+                    #print(f"\n✅ Match found! Token: '{query_token}' in '{doc_token}'.")
+                    #print(f"📄 Context: {doc_text[:500]}")
                     return True  
                     
     return False  # If no match found
@@ -305,6 +305,62 @@ for doc_text in bm25_documents:
     VALID_WORDS.update(extract_keywords(doc_text))
 
 
+def group_pages_by_pdf(document_entries):
+    """
+    Groups consecutive pages for the same PDF into a range format.
+    Example:
+        Input: [("file1.pdf", 1), ("file1.pdf", 2), ("file1.pdf", 3), ("file2.pdf", 10), ("file2.pdf", 12)]
+        Output: ["file1.pdf (Pages 1-3)", "file2.pdf (Pages 10, 12)"]
+    """
+    grouped_results = []
+    current_pdf = None
+    current_pages = []
+
+    for file_name, page in document_entries:
+        if file_name != current_pdf:  
+            # If switching to a new PDF, store the previous result
+            if current_pdf:
+                grouped_results.append(format_page_range(current_pdf, current_pages))
+            # Reset tracking for new PDF
+            current_pdf = file_name
+            current_pages = [page]
+        else:
+            current_pages.append(page)
+
+    # Add the last processed PDF
+    if current_pdf:
+        grouped_results.append(format_page_range(current_pdf, current_pages))
+
+    return grouped_results
+
+def format_page_range(file_name, pages):
+    """
+    Converts a list of page numbers into a formatted string.
+    Example:
+        Input: "file1.pdf", [1, 2, 3, 5, 6, 8]
+        Output: "📄 file1.pdf (Pages 1-3, 5-6, 8)"
+    """
+    pages.sort()
+    ranges = []
+    start = pages[0]
+
+    for i in range(1, len(pages)):
+        if pages[i] != pages[i - 1] + 1:  # Break in sequence
+            if start == pages[i - 1]:
+                ranges.append(f"{start}")
+            else:
+                ranges.append(f"{start}-{pages[i - 1]}")
+            start = pages[i]
+
+    # Add the final range
+    if start == pages[-1]:
+        ranges.append(f"{start}")
+    else:
+        ranges.append(f"{start}-{pages[-1]}")
+
+    return f"📄 **{file_name} (Pages {', '.join(ranges)})**"
+
+
 # === ACTION 2: GET PDF NAMES & PAGE LOCATIONS === #
 class ActionGetClassMaterialLocation(Action):
     def name(self):
@@ -314,6 +370,8 @@ class ActionGetClassMaterialLocation(Action):
         query = tracker.latest_message.get("text")  
 
         # treat user query:
+        print(f"\n📍 Raw query: {query}")
+
         query_tokens = query.split()  # Extract meaningful keywords
         print(f"    📖 Query tokens: {query_tokens}")
 
@@ -321,7 +379,7 @@ class ActionGetClassMaterialLocation(Action):
         print(f"    ✅ Corrected Tokens After Spell Check: {corrected_tokens}")
 
         query = " ".join(corrected_tokens)
-        print(f"    📍 Treated query: {query}")
+        print(f"📍 Treated query: {query}")
 
         query_tokens = extract_simple_tokens(query)  # Extract meaningful keywords
         print(f"\n📖 Finding material location for: {query_tokens}")
@@ -336,7 +394,7 @@ class ActionGetClassMaterialLocation(Action):
         bm25_scores = bm25_index.get_scores(expanded_tokens) # tem de ser dos tokens individuais
         top_indices = np.argsort(bm25_scores)[::-1][:10]  # Top 10 matches
 
-        print('_'*80)
+        print('_'*100)
 
         query_tokens = extract_keywords(query)  # Extract meaningful keywords
         print(f"\n📖 Finding material location for: {query_tokens}")
@@ -375,13 +433,14 @@ class ActionGetClassMaterialLocation(Action):
         document_entries.sort(key=lambda x: (x[0].lower(), x[1]))  
 
         # Format results
-        location_results = [f"📄 **{entry[0]} (Page {entry[1]})**" for entry in document_entries]
+        location_results = group_pages_by_pdf(document_entries)
 
         if location_results:
             print("\n🎯 Material location for query found!")
             print("\n📌 FINAL SORTED RESULTS:")
             for result in location_results:
                 print(result)
+            print()
             dispatcher.utter_message(text="You can find more information in:\n" + "\n".join(location_results))
         else:
             print("\n⚠️  No exact references found, but you might check related PDFs.")
