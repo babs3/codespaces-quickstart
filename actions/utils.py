@@ -183,7 +183,7 @@ def treat_raw_query(query):
     # === Treat user query === #
     print(f"\n📍 Raw query: {query}")
 
-    query_tokens = query.split()  
+    query_tokens = [token.text for token in nlp(query)]
     print(f"    📖 Query tokens: {query_tokens}")
 
     imp_tokens = extract_simple_tokens(query) # Extract meaningful keywords
