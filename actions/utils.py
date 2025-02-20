@@ -6,7 +6,7 @@ nlp = spacy.load("en_core_web_sm")
 
 # Define known synonyms (expand this list over time)
 SYNONYM_MAP = {
-    "framework": ["analysis", "model", "methodology"],
+    "framework": ["analysis", "model", "methodology", "method"],
     "evaluation": ["assessment", "review"]
 }
 
@@ -81,38 +81,35 @@ def correct_query_tokens(tokens, set):
     """Corrects a list of tokens for spelling mistakes."""
     return [correct_spelling(token, set) for token in tokens]
 
-# === STEP 4: DOCUMENT FILTERING BASED ON MWE PRESENCE === #
-def document_contains_expression(doc_text, expressions, threshold=80):
-    """Ensures that at least one key expression exists in the document."""
-    for expr in expressions:
-        for sentence in doc_text.split("."):  # Check each sentence separately
-            if fuzz.token_set_ratio(expr.lower(), sentence.lower()) >= threshold:
-                return True
-    return False
 
+def lemmatize_word(word):
+    """Returns the lemma of a given word (e.g., 'methods' → 'method')."""
+    doc = nlp(word)
+    return doc[0].lemma_  # Return the base form (lemma)
 
-# Function to check if any query token loosely matches document tokens
-def fuzzy_match(query_tokens, document_tokens, threshold=80):
-    """Ensures that multi-word terms appear as full expressions in the document text."""
+def fuzzy_match(query_tokens, document_tokens, threshold=85):
+    """Matches query tokens against document tokens, handling lemmatization & fuzzy similarity."""
     
     doc_text = " ".join(document_tokens).lower()  # Join doc tokens into full text
     query_tokens = [qt.lower() for qt in query_tokens]  # Lowercase query tokens
-
+    
     for query_token in query_tokens:
-        print(f"\n\n> doc_text:\n{doc_text}")
+        lemma_query = lemmatize_word(query_token)  # Convert to base form
+        
         if " " in query_token:  # If query token is a phrase (e.g., "pestel framework")
-            if query_token in doc_text:  # Check if entire phrase appears in doc
-                #print(f"\n✅ Exact phrase match found! Token: '{query_token}'")
-                #print(f"📄 Context: {doc_text[:500]}")  # Print first 500 chars for debugging
+            if query_token in doc_text or lemma_query in doc_text:  # Check for phrase
                 return True
-        else:  # If single word, apply fuzzy matching
+        else:  # Single word matching
             for doc_token in document_tokens:
-                if fuzz.token_set_ratio(query_token, doc_token) >= threshold:
-                    #print(f"\n✅ Match found! Token: '{query_token}' in '{doc_token}'.")
-                    #print(f"📄 Context: {doc_text[:500]}")
+                lemma_doc = lemmatize_word(doc_token)  # Lemmatize doc token
+                
+                # Allow exact match, lemmatized match, or fuzzy match
+                if (query_token == doc_token or  
+                    lemma_query == lemma_doc or  
+                    fuzz.token_set_ratio(query_token, doc_token) >= threshold):
                     return True  
-                    
-    return False  # If no match found
+
+    return False  # No match found
 
 def extract_simple_tokens(query):
     """Extracts only meaningful single-word tokens from a query (excluding stopwords & phrases)."""
