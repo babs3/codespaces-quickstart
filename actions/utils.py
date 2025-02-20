@@ -14,6 +14,19 @@ SYNONYM_MAP = {
 with open("vector_store/bm25_index.pkl", "rb") as f:
     bm25_index, bm25_metadata, bm25_documents = pickle.load(f)
 
+def treat_raw_query(query):
+    # === Treat user query === #
+    print(f"\n📍 Raw query: {query}")
+
+    query_tokens = query.split()  # Extract meaningful keywords
+    print(f"    📖 Query tokens: {query_tokens}")
+
+    corrected_tokens = correct_query_tokens(query_tokens, VALID_SIMPLE_WORDS) # Correct potential misspellings in the student query
+    print(f"    ✅ Corrected Tokens After Spell Check: {corrected_tokens}")
+
+    query = " ".join(corrected_tokens)
+    print(f"📍 Treated query: {query}")
+    return query
 
 # === STEP 1: MULTI-WORD EXPRESSION (MWE) EXTRACTION === #
 
@@ -97,7 +110,8 @@ def fuzzy_match(query_tokens, document_tokens, threshold=85):
         lemma_query = lemmatize_word(query_token)  # Convert to base form
         
         if " " in query_token:  # If query token is a phrase (e.g., "pestel framework")
-            if query_token in doc_text or lemma_query in doc_text:  # Check for phrase
+            if query_token in doc_text: # or lemma_query in doc_text:  # Check for phrase
+                print(f"\n💚 Match in query_token '{query_token}':\n{doc_text}")
                 return True
         else:  # Single word matching
             for doc_token in document_tokens:
@@ -107,6 +121,8 @@ def fuzzy_match(query_tokens, document_tokens, threshold=85):
                 if (query_token == doc_token or  
                     lemma_query == lemma_doc or  
                     fuzz.token_set_ratio(query_token, doc_token) >= threshold):
+                    print(f"\n📗 Match in query_token '{query_token}'=='{doc_token}' or lemma_query '{lemma_query}'=='{lemma_doc}'")
+
                     return True  
 
     return False  # No match found

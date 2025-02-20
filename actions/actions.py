@@ -35,18 +35,10 @@ class ActionFetchClassMaterial(Action):
     def run(self, dispatcher, tracker, domain):
         query = tracker.latest_message.get("text")  # Get user query
         print(f"\n🧒 User query: '{query}'")
+        query = treat_raw_query(query)
 
         # === DENSE (Vector) SEARCH === #
-        print(f"\n🔛 Getting query embeddings...")
-
-        query_tokens = query.split()  # Extract meaningful keywords
-        print(f"    📖 Query tokens: {query_tokens}")
-
-        corrected_tokens = correct_query_tokens(query_tokens, VALID_SIMPLE_WORDS) # Correct potential misspellings in the student query
-        print(f"    ✅ Corrected Tokens After Spell Check: {corrected_tokens}")
-
-        query = " ".join(corrected_tokens)
-        print(f"    📍 Getting query embeddings for query: {query}")
+        print(f"\n🔛 Getting query embeddings for query: '{query}'")
         
         query_embedding = model.encode(query, convert_to_numpy=True).tolist()
         vector_results = collection.query(query_embeddings=[query_embedding], n_results=20)
@@ -62,10 +54,7 @@ class ActionFetchClassMaterial(Action):
         query_tokens = extract_simple_tokens(query)  # Extract meaningful keywords
         print(f"    📖 Query tokens: {query_tokens}")
 
-        corrected_tokens = correct_query_tokens(query_tokens, VALID_SIMPLE_WORDS) # Correct potential misspellings in the student query
-        print(f"    ✅ Corrected Tokens After Spell Check: {corrected_tokens}")
-
-        expanded_tokens = expand_query_with_synonyms(corrected_tokens)  # Expand with synonyms
+        expanded_tokens = expand_query_with_synonyms(query_tokens)  # Expand with synonyms
         print(f"    🔄 Expanded keywords with synonyms: {expanded_tokens}")
         print(f"    📍 Getting bm25_scores for tokens: {expanded_tokens}")
 
@@ -158,20 +147,9 @@ class ActionGetClassMaterialLocation(Action):
         return "action_get_class_material_location"
 
     def run(self, dispatcher, tracker, domain):
-        query = tracker.latest_message.get("text")  
 
-        # === Treat user query === #
-        print(f"\n📍 Raw query: {query}")
-
-        query_tokens = query.split()  # Extract meaningful keywords
-        print(f"    📖 Query tokens: {query_tokens}")
-
-        corrected_tokens = correct_query_tokens(query_tokens, VALID_SIMPLE_WORDS) # Correct potential misspellings in the student query
-        print(f"    ✅ Corrected Tokens After Spell Check: {corrected_tokens}")
-
-        query = " ".join(corrected_tokens)
-        print(f"📍 Treated query: {query}")
-
+        print(f" 🔖 --------- Getting class materials location --------- 🔖 ")
+        query = treat_raw_query(tracker.latest_message.get("text"))
 
         # === Perform BM25 search with simple tokens === #
         # Step 1: Extract both complex & simple tokens
@@ -205,18 +183,9 @@ class ActionGetClassMaterialLocation(Action):
             # Tokenize the document text
             document_tokens = extract_complex_tokens(document_text)
 
-            #final_tokens = expanded_complex + expanded_simple
-
             # Perform fuzzy matching -> solves matches like 'external environment analysis\npestel analysis'
             if fuzzy_match(expanded_complex, document_tokens):
                 document_entries.append((file_name, page_number))
-
-            #for token in corrected_tokens:
-            #    if token in document_tokens:
-            #        print(f"✅ Match found! Token: '{token}' in document: '{file_name}' (Page {page_number})")
-            #        print(f"📄 Context: {' '.join(document_tokens)}")  # Print full document tokens for debugging
-            #        document_entries.append((file_name, page_number))
-            #        break  # Stop after the first match
 
 
         # **Sort by PDF name (A-Z) and then by page number (ascending)**
