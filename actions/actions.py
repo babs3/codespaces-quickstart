@@ -148,7 +148,7 @@ class ActionGetClassMaterialLocation(Action):
 
     def run(self, dispatcher, tracker, domain):
 
-        print(f" 🔖 --------- Getting class materials location --------- 🔖 ")
+        print(f"\n\n 🔖 --------- Getting class materials location --------- 🔖 ")
         query = treat_raw_query(tracker.latest_message.get("text"))
 
         # === Perform BM25 search with simple tokens === #

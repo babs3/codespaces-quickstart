@@ -1,6 +1,7 @@
 import spacy
 from fuzzywuzzy import fuzz
 import pickle
+from difflib import get_close_matches
 
 nlp = spacy.load("en_core_web_sm")
 
@@ -14,19 +15,6 @@ SYNONYM_MAP = {
 with open("vector_store/bm25_index.pkl", "rb") as f:
     bm25_index, bm25_metadata, bm25_documents = pickle.load(f)
 
-def treat_raw_query(query):
-    # === Treat user query === #
-    print(f"\n📍 Raw query: {query}")
-
-    query_tokens = query.split()  # Extract meaningful keywords
-    print(f"    📖 Query tokens: {query_tokens}")
-
-    corrected_tokens = correct_query_tokens(query_tokens, VALID_SIMPLE_WORDS) # Correct potential misspellings in the student query
-    print(f"    ✅ Corrected Tokens After Spell Check: {corrected_tokens}")
-
-    query = " ".join(corrected_tokens)
-    print(f"📍 Treated query: {query}")
-    return query
 
 # === STEP 1: MULTI-WORD EXPRESSION (MWE) EXTRACTION === #
 
@@ -76,23 +64,6 @@ def expand_query_with_synonyms(query_expressions):
             expanded_queries.add(" ".join(combination))  # Rebuild phrase
 
     return list(expanded_queries)
-
-
-# === STEP 3: SPELL CORRECTION === #
-
-from difflib import get_close_matches
-
-def correct_spelling(word, set):
-    """Corrects spelling by finding the closest valid match."""
-    closest_match = get_close_matches(word, set, n=1, cutoff=0.8)  # 80% similarity threshold
-    if closest_match:
-        print(f"    - 🐟 best match for '{word}': {closest_match[0]}")
-    return closest_match[0] if closest_match else word  # Return the match or original word
-
-# === SPELL CHECK WRAPPER === #
-def correct_query_tokens(tokens, set):
-    """Corrects a list of tokens for spelling mistakes."""
-    return [correct_spelling(token, set) for token in tokens]
 
 
 def lemmatize_word(word):
@@ -207,3 +178,43 @@ def format_page_range(file_name, pages):
         ranges.append(f"{start}-{pages[-1]}")
 
     return f"📄 **{file_name} (Pages {', '.join(ranges)})**"
+
+def treat_raw_query(query):
+    # === Treat user query === #
+    print(f"\n📍 Raw query: {query}")
+
+    query_tokens = query.split()  
+    print(f"    📖 Query tokens: {query_tokens}")
+
+    imp_tokens = extract_simple_tokens(query) # Extract meaningful keywords
+    imp_tokens_dict = {}
+    for token in imp_tokens:
+        # Correct potential misspellings in the student query 
+        imp_tokens_dict.update({token: correct_spelling(token)})
+
+    updated_query_tokens = []
+    for token in query_tokens:
+        if imp_tokens_dict.get(token):
+            updated_query_tokens.append(imp_tokens_dict.get(token))
+        else: 
+            updated_query_tokens.append(token)
+    print(f"    ✅ Corrected Tokens After Spell Check: {updated_query_tokens}")
+ 
+    query = " ".join(updated_query_tokens)
+    print(f"📍 Treated query: {query}")
+    
+    return query
+
+# === SPELL CORRECTION === #
+
+def correct_spelling(word, set=VALID_SIMPLE_WORDS):
+    """Corrects spelling by finding the closest valid match."""
+    closest_match = get_close_matches(word, set, n=1, cutoff=0.8)  # 80% similarity threshold
+    if closest_match:
+        print(f"    - 🐟 best match for '{word}': {closest_match[0]}")
+    return closest_match[0] if closest_match else word  # Return the match or original word
+
+# === SPELL CHECK WRAPPER === #
+def correct_query_tokens(tokens, set):
+    """Corrects a list of tokens for spelling mistakes."""
+    return [correct_spelling(token, set) for token in tokens]
