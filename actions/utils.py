@@ -17,7 +17,7 @@ with open("vector_store/bm25_index.pkl", "rb") as f:
 
 # === STEP 1: MULTI-WORD EXPRESSION (MWE) EXTRACTION === #
 
-def extract_keywords(query):
+def extract_complex_tokens(query):
     """Extracts only meaningful subject keywords from a query."""
     doc = nlp(query.lower())  # Process query with NLP model
     keywords = []
@@ -82,7 +82,7 @@ def correct_query_tokens(tokens, set):
     return [correct_spelling(token, set) for token in tokens]
 
 # === STEP 4: DOCUMENT FILTERING BASED ON MWE PRESENCE === #
-def document_contains_expression(doc_text, expressions, threshold=85):
+def document_contains_expression(doc_text, expressions, threshold=80):
     """Ensures that at least one key expression exists in the document."""
     for expr in expressions:
         for sentence in doc_text.split("."):  # Check each sentence separately
@@ -92,13 +92,14 @@ def document_contains_expression(doc_text, expressions, threshold=85):
 
 
 # Function to check if any query token loosely matches document tokens
-def fuzzy_match(query_tokens, document_tokens, threshold=95):
+def fuzzy_match(query_tokens, document_tokens, threshold=80):
     """Ensures that multi-word terms appear as full expressions in the document text."""
     
     doc_text = " ".join(document_tokens).lower()  # Join doc tokens into full text
     query_tokens = [qt.lower() for qt in query_tokens]  # Lowercase query tokens
 
     for query_token in query_tokens:
+        print(f"\n\n> doc_text:\n{doc_text}")
         if " " in query_token:  # If query token is a phrase (e.g., "pestel framework")
             if query_token in doc_text:  # Check if entire phrase appears in doc
                 #print(f"\n✅ Exact phrase match found! Token: '{query_token}'")
@@ -136,7 +137,7 @@ for doc_text in bm25_documents:
     VALID_SIMPLE_WORDS.update(extract_simple_tokens(doc_text))
 VALID_WORDS = set()
 for doc_text in bm25_documents:
-    VALID_WORDS.update(extract_keywords(doc_text))
+    VALID_WORDS.update(extract_complex_tokens(doc_text))
 
 
 def group_pages_by_pdf(document_entries):

@@ -160,7 +160,7 @@ class ActionGetClassMaterialLocation(Action):
     def run(self, dispatcher, tracker, domain):
         query = tracker.latest_message.get("text")  
 
-        # treat user query:
+        # === Treat user query === #
         print(f"\n📍 Raw query: {query}")
 
         query_tokens = query.split()  # Extract meaningful keywords
@@ -171,30 +171,27 @@ class ActionGetClassMaterialLocation(Action):
 
         query = " ".join(corrected_tokens)
         print(f"📍 Treated query: {query}")
+
+
+        # === Perform BM25 search with simple tokens === #
+        # Step 1: Extract both complex & simple tokens
+        complex_tokens = extract_complex_tokens(query)  # e.g., ["pestel analysis"]
+        simple_tokens = extract_simple_tokens(query)  # e.g., ["pestel", "analysis"]
+        print(f"\n📖 Finding material location for:\n - {complex_tokens}\n - {simple_tokens}")
+
+        # Step 3: Expand with synonyms
+        expanded_complex = expand_query_with_synonyms(complex_tokens)
+        expanded_simple = expand_query_with_synonyms(simple_tokens)
+        print(f"🔄 Expanded keywords with synonyms:\n - {expanded_complex}\n - {expanded_simple}")
         
+        # Step 4: Perform BM25 Search
+        bm25_scores_complex = bm25_index.get_scores(expanded_complex)
+        bm25_scores_simple = bm25_index.get_scores(expanded_simple)
 
-        # Perform BM25 search with simple tokens
-        query_tokens = extract_simple_tokens(query)  # Extract meaningful keywords
-        print(f"\n📖 Finding material location for: {query_tokens}")
+        # Step 5: Combine Scores (Weighting Complex Matches Higher)
+        final_scores = 1.5 * bm25_scores_complex + 1.0 * bm25_scores_simple  # Give priority to complex matches
 
-        corrected_tokens = correct_query_tokens(query_tokens, VALID_SIMPLE_WORDS) # Correct potential misspellings in the student query
-        print(f"✅ Corrected Tokens After Spell Check: {corrected_tokens}")
-
-        expanded_tokens = expand_query_with_synonyms(corrected_tokens)  # Expand with synonyms
-        print(f"🔄 Expanded keywords with synonyms: {expanded_tokens}")
-        
-        bm25_scores = bm25_index.get_scores(expanded_tokens) # tem de ser dos tokens individuais
-        top_indices = np.argsort(bm25_scores)[::-1][:10]  # Top 10 matches
-
-        
-        print('_'*100)
-
-        # here the query was already treated, so we dont need to correct misspellings
-        query_tokens = extract_keywords(query)  # Extract meaningful keywords
-        print(f"\n📖 Finding material location for: {query_tokens}")
-
-        expanded_tokens = expand_query_with_synonyms(corrected_tokens)  # Expand with synonyms
-        print(f"🔄 Expanded keywords with synonyms: {expanded_tokens}")
+        top_indices = np.argsort(final_scores)[::-1][:10]  # Top 10 results
     
 
         location_results = []
@@ -206,10 +203,12 @@ class ActionGetClassMaterialLocation(Action):
             document_text = bm25_documents[i]
 
             # Tokenize the document text
-            document_tokens = extract_keywords(document_text)
+            document_tokens = extract_complex_tokens(document_text)
+
+            #final_tokens = expanded_complex + expanded_simple
 
             # Perform fuzzy matching -> solves matches like 'external environment analysis\npestel analysis'
-            if fuzzy_match(expanded_tokens, document_tokens):
+            if fuzzy_match(expanded_complex, document_tokens):
                 document_entries.append((file_name, page_number))
 
             #for token in corrected_tokens:
