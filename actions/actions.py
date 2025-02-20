@@ -104,16 +104,22 @@ def expand_query_with_synonyms(query_expressions):
 
 
 # === STEP 3: SPELL CORRECTION === #
-def correct_misspellings(query_expressions, document_terms, threshold=80):
-    """Corrects potential spelling errors using fuzzy matching."""
-    corrected = []
-    for expr in query_expressions:
-        best_match, score = process.extractOne(expr, document_terms)
-        if score >= threshold:
-            corrected.append(best_match)
-        else:
-            corrected.append(expr)
-    return corrected
+
+from difflib import get_close_matches
+
+def correct_spelling(word, set):
+    """Corrects spelling by finding the closest valid match."""
+    closest_match = get_close_matches(word, set, n=1, cutoff=0.8)  # 80% similarity threshold
+    if closest_match:
+        print(f"    - 🐟 best match for '{word}': {closest_match[0]}; {closest_match}")
+    return closest_match[0] if closest_match else word  # Return the match or original word
+
+# === SPELL CHECK WRAPPER === #
+def correct_query_tokens(tokens, set):
+    """Corrects a list of tokens for spelling mistakes."""
+    return [correct_spelling(token, set) for token in tokens]
+
+
 
 # === STEP 4: DOCUMENT FILTERING BASED ON MWE PRESENCE === #
 def document_contains_expression(doc_text, expressions, threshold=85):
@@ -132,9 +138,20 @@ class ActionFetchClassMaterial(Action):
 
     def run(self, dispatcher, tracker, domain):
         query = tracker.latest_message.get("text")  # Get user query
-        print(f"🧒 User query: '{query}'")
+        print(f"\n🧒 User query: '{query}'")
 
         # === DENSE (Vector) SEARCH === #
+        print(f"\n🔛 Getting query embeddings...")
+
+        query_tokens = query.split()  # Extract meaningful keywords
+        print(f"    📖 Query tokens: {query_tokens}")
+
+        corrected_tokens = correct_query_tokens(query_tokens, VALID_SIMPLE_WORDS) # Correct potential misspellings in the student query
+        print(f"    ✅ Corrected Tokens After Spell Check: {corrected_tokens}")
+
+        query = " ".join(corrected_tokens)
+        print(f"    📍 Getting query embeddings for query: {query}")
+        
         query_embedding = model.encode(query, convert_to_numpy=True).tolist()
         vector_results = collection.query(query_embeddings=[query_embedding], n_results=20)
 
@@ -143,10 +160,20 @@ class ActionFetchClassMaterial(Action):
         vector_scores = vector_results["distances"][0]  # Lower is better (L2 distance)
 
         # === SPARSE (BM25) SEARCH === #
-        query_tokens = tokenize(query)
-        print(f"\n📖 Getting bm25_scores for tokens: {query_tokens}")
+        #query_tokens = tokenize(query)
+        print(f"\n🔛 Getting BM25 sparse vectors...")
 
-        bm25_scores = bm25_index.get_scores(query_tokens)
+        query_tokens = extract_simple_tokens(query)  # Extract meaningful keywords
+        print(f"    📖 Query tokens: {query_tokens}")
+
+        corrected_tokens = correct_query_tokens(query_tokens, VALID_SIMPLE_WORDS) # Correct potential misspellings in the student query
+        print(f"    ✅ Corrected Tokens After Spell Check: {corrected_tokens}")
+
+        expanded_tokens = expand_query_with_synonyms(corrected_tokens)  # Expand with synonyms
+        print(f"    🔄 Expanded keywords with synonyms: {expanded_tokens}")
+        print(f"    📍 Getting bm25_scores for tokens: {expanded_tokens}")
+
+        bm25_scores = bm25_index.get_scores(expanded_tokens)
         top_bm25_indices = np.argsort(bm25_scores)[::-1][:20]  # Top 20 results
 
         bm25_docs = [bm25_documents[i] for i in top_bm25_indices]
@@ -180,7 +207,7 @@ class ActionFetchClassMaterial(Action):
         scores = [score for _, _, score in hybrid_results]
         max_score = max(scores) if scores else 1
         adaptive_threshold = max(np.mean(scores) + 0.5 * np.std(scores), np.percentile(scores, 80), 0.7 * max_score)
-        print(f"\n📊 Adaptive Threshold: {np.mean(scores) + 0.5 * np.std(scores):.3f}, Percentile_80 Threshold: {np.percentile(scores, 80):.3f}, Max Score Threshold: {0.7 * max_score:.3f} \nFinal Threshold => {adaptive_threshold:.3f}")
+        print(f"\n📊 Adaptive Threshold: {np.mean(scores) + 0.5 * np.std(scores):.3f}, Percentile_80 threshold: {np.percentile(scores, 80):.3f}, Max Score Threshold: {0.7 * max_score:.3f} \nFinal Threshold => {adaptive_threshold:.3f}")
 
         # Filter results
         selected_results = [(doc, meta, score) for doc, meta, score in hybrid_results if score >= adaptive_threshold]
@@ -230,14 +257,27 @@ class ActionFetchClassMaterial(Action):
 
 
 # Function to check if any query token loosely matches document tokens
-def fuzzy_match(query_tokens, document_tokens, threshold=80):
+def fuzzy_match(query_tokens, document_tokens, threshold=95):
+    """Ensures that multi-word terms appear as full expressions in the document text."""
+    
+    doc_text = " ".join(document_tokens).lower()  # Join doc tokens into full text
+    query_tokens = [qt.lower() for qt in query_tokens]  # Lowercase query tokens
+
     for query_token in query_tokens:
-        for doc_token in document_tokens:
-            if fuzz.token_set_ratio(query_token.lower(), doc_token.lower()) >= threshold:
-                print(f"\n✅ Match found! Token: '{query_token}'.")
-                print(f"📄 Context: {' '.join(document_tokens)}")  # Print full document tokens for debugging
-                return True  # If any match is found, return True
-    return False
+        if " " in query_token:  # If query token is a phrase (e.g., "pestel framework")
+            if query_token in doc_text:  # Check if entire phrase appears in doc
+                print(f"\n✅ Exact phrase match found! Token: '{query_token}'")
+                print(f"📄 Context: {doc_text[:500]}")  # Print first 500 chars for debugging
+                return True
+        else:  # If single word, apply fuzzy matching
+            for doc_token in document_tokens:
+                if fuzz.token_set_ratio(query_token, doc_token) >= threshold:
+                    print(f"\n✅ Match found! Token: '{query_token}' in '{doc_token}'.")
+                    print(f"📄 Context: {doc_text[:500]}")
+                    return True  
+                    
+    return False  # If no match found
+
 
 def extract_simple_tokens(query):
     """Extracts only meaningful single-word tokens from a query (excluding stopwords & phrases)."""
@@ -256,6 +296,15 @@ def extract_simple_tokens(query):
     keywords = list(dict.fromkeys(keywords))
     return keywords
 
+# Collect all unique words from BM25 documents to compare for spell correction
+VALID_SIMPLE_WORDS = set()
+for doc_text in bm25_documents:
+    VALID_SIMPLE_WORDS.update(extract_simple_tokens(doc_text))
+VALID_WORDS = set()
+for doc_text in bm25_documents:
+    VALID_WORDS.update(extract_keywords(doc_text))
+
+
 # === ACTION 2: GET PDF NAMES & PAGE LOCATIONS === #
 class ActionGetClassMaterialLocation(Action):
     def name(self):
@@ -264,39 +313,40 @@ class ActionGetClassMaterialLocation(Action):
     def run(self, dispatcher, tracker, domain):
         query = tracker.latest_message.get("text")  
 
+        # treat user query:
+        query_tokens = query.split()  # Extract meaningful keywords
+        print(f"    📖 Query tokens: {query_tokens}")
+
+        corrected_tokens = correct_query_tokens(query_tokens, VALID_SIMPLE_WORDS) # Correct potential misspellings in the student query
+        print(f"    ✅ Corrected Tokens After Spell Check: {corrected_tokens}")
+
+        query = " ".join(corrected_tokens)
+        print(f"    📍 Treated query: {query}")
+
         query_tokens = extract_simple_tokens(query)  # Extract meaningful keywords
-        expanded_tokens = expand_query_with_synonyms(query_tokens)  # Expand with synonyms
         print(f"\n📖 Finding material location for: {query_tokens}")
-        print(f"🔄 Expanded keywords with synonyms: {expanded_tokens}")
 
-        # Collect all unique words from BM25 documents to compare for spell correction
-        all_document_tokens = set()
-        for doc_text in bm25_documents:
-            all_document_tokens.update(extract_simple_tokens(doc_text))
-
-        # Correct potential misspellings in the student query
-        corrected_tokens = correct_misspellings(expanded_tokens, list(all_document_tokens))
+        corrected_tokens = correct_query_tokens(query_tokens, VALID_SIMPLE_WORDS) # Correct potential misspellings in the student query
         print(f"✅ Corrected Tokens After Spell Check: {corrected_tokens}")
 
+        expanded_tokens = expand_query_with_synonyms(corrected_tokens)  # Expand with synonyms
+        print(f"🔄 Expanded keywords with synonyms: {expanded_tokens}")
+        
         # Perform BM25 search
-        bm25_scores = bm25_index.get_scores(corrected_tokens) # tem de ser dos tokens individuais
+        bm25_scores = bm25_index.get_scores(expanded_tokens) # tem de ser dos tokens individuais
         top_indices = np.argsort(bm25_scores)[::-1][:10]  # Top 10 matches
 
-        print('_'*100)
+        print('_'*80)
 
         query_tokens = extract_keywords(query)  # Extract meaningful keywords
-        expanded_tokens = expand_query_with_synonyms(query_tokens)  # Expand with synonyms
         print(f"\n📖 Finding material location for: {query_tokens}")
+
+        corrected_tokens = correct_query_tokens(query_tokens, VALID_WORDS) # Correct potential misspellings in the student query
+        print(f"✅ Corrected Tokens After Spell Check: {corrected_tokens}")
+
+        expanded_tokens = expand_query_with_synonyms(corrected_tokens)  # Expand with synonyms
         print(f"🔄 Expanded keywords with synonyms: {expanded_tokens}")
-
-        # Collect all unique words from BM25 documents to compare for spell correction
-        all_document_tokens = set()
-        for doc_text in bm25_documents:
-            all_document_tokens.update(extract_keywords(doc_text))
-
-        # Correct potential misspellings in the student query
-        #corrected_tokens = correct_misspellings(expanded_tokens, list(all_document_tokens))
-        print(f"✅ Corrected Tokens After Spell Check: {expanded_tokens}")
+    
 
         location_results = []
         document_entries = []  # Store documents before sorting
