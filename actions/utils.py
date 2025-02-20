@@ -5,12 +5,6 @@ from difflib import get_close_matches
 
 nlp = spacy.load("en_core_web_sm")
 
-# Define known synonyms (expand this list over time)
-SYNONYM_MAP = {
-    "framework": ["analysis", "model", "methodology", "method"],
-    "evaluation": ["assessment", "review"]
-}
-
 # Load BM25 index
 with open("vector_store/bm25_index.pkl", "rb") as f:
     bm25_index, bm25_metadata, bm25_documents = pickle.load(f)
@@ -42,9 +36,21 @@ def extract_complex_tokens(query):
     return keywords
 
 
+# === EXPAND SYNONYMS === #
 from itertools import product
+import nltk
+nltk.download('wordnet')
+nltk.download('omw-1.4')  # Optional, for additional synonyms
+from nltk.corpus import wordnet
 
-# === STEP 2: EXPAND SYNONYMS === #
+def get_synonyms(word):
+    """Fetch synonyms from WordNet."""
+    synonyms = set()
+    for syn in wordnet.synsets(word):
+        for lemma in syn.lemmas():
+            synonyms.add(lemma.name().replace("_", " "))  # Replace underscores in multi-word terms
+    return list(synonyms)
+
 def expand_query_with_synonyms(query_expressions):
     """Expand expressions with their known synonyms, preserving multi-word structure."""
     expanded_queries = set()
@@ -54,16 +60,15 @@ def expand_query_with_synonyms(query_expressions):
         synonym_options = []
 
         for word in words:
-            if word in SYNONYM_MAP:
-                synonym_options.append([word] + SYNONYM_MAP[word])  # Include original word + synonyms
-            else:
-                synonym_options.append([word])  # Keep the word unchanged
+            synonyms = get_synonyms(word)  # Fetch synonyms dynamically
+            synonym_options.append([word] + synonyms)  # Include original word + synonyms
 
         # Generate all possible replacements (cartesian product)
         for combination in product(*synonym_options):
             expanded_queries.add(" ".join(combination))  # Rebuild phrase
 
     return list(expanded_queries)
+
 
 
 def lemmatize_word(word):
