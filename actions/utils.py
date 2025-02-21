@@ -12,21 +12,27 @@ with open("vector_store/bm25_index.pkl", "rb") as f:
 
 # === STEP 1: MULTI-WORD EXPRESSION (MWE) EXTRACTION === #
 
-def extract_complex_tokens(query):
+def extract_complex_tokens(query, can_print): # ['pestel analysis']
     """Extracts only meaningful subject keywords from a query."""
     doc = nlp(query.lower())  # Process query with NLP model
     keywords = []
     single_word_tokens = set()  # Store individual words temporarily
 
     # Extract noun phrases (multi-word terms)
+    #i = 0
+    print()
     for chunk in doc.noun_chunks:
+        #i += 1
         keyword = chunk.text.strip()
+        if can_print: print(f"👻 keyword: {keyword}")
         if len(keyword.split()) > 1:  # Only keep multi-word phrases
             keywords.append(keyword)
             single_word_tokens.update(keyword.split())  # Store individual words to avoid later
 
+    print()
     # Extract single meaningful words (NOUN, PROPN) **if not part of a noun phrase**
     for token in doc:
+        if can_print: print(f"    TOKENN: {token}")
         if token.pos_ in {"NOUN", "PROPN"} and not token.is_stop:
             if token.text not in single_word_tokens:  # Exclude if part of a noun phrase
                 keywords.append(token.text)
@@ -34,6 +40,25 @@ def extract_complex_tokens(query):
     # Remove duplicates while preserving order
     keywords = list(dict.fromkeys(keywords))
     return keywords
+
+
+def extract_key_expressions(text): # ['pestel', 'analysis', 'pestel analysis']
+    """ Extracts key multi-word expressions using NLP phrase detection. """
+    doc = nlp(text.lower())
+    key_expressions = set()
+
+    # Extract multi-word phrases (noun chunks)
+    for chunk in doc.noun_chunks:
+        phrase = chunk.text.strip()
+        if len(phrase.split()) > 1:  
+            key_expressions.add(phrase)  
+
+    # Add important single words
+    for token in doc:
+        if token.pos_ in {"NOUN", "PROPN"} and not token.is_stop:
+            key_expressions.add(token.text)
+
+    return list(key_expressions)
 
 
 # === EXPAND SYNONYMS === #
@@ -69,6 +94,26 @@ def expand_query_with_synonyms(query_expressions):
 
     return list(expanded_queries)
 
+def expand_query_with_weighted_synonyms(query_expressions):
+    """Expand query with weighted synonyms: prioritize more relevant expansions."""
+    expanded_queries = set()
+    
+    for expr in query_expressions:
+        words = expr.split()
+        synonym_options = []
+
+        for word in words:
+            synonyms = get_synonyms(word)
+            strong_synonyms = synonyms[:3]  # Limit to top 3 most relevant synonyms
+
+            # Prioritize original word, then close synonyms
+            synonym_options.append([word] + strong_synonyms)
+
+        for combination in product(*synonym_options):
+            expanded_queries.add(" ".join(combination))
+
+    return list(expanded_queries)
+
 
 
 def lemmatize_word(word):
@@ -97,13 +142,13 @@ def fuzzy_match(query_tokens, document_tokens, threshold=85):
                 if (query_token == doc_token or  
                     lemma_query == lemma_doc or  
                     fuzz.token_set_ratio(query_token, doc_token) >= threshold):
-                    print(f"\n📗 Match in query_token '{query_token}'=='{doc_token}' or lemma_query '{lemma_query}'=='{lemma_doc}'")
+                    #print(f"\n📗 Match in query_token '{query_token}'=='{doc_token}' or lemma_query '{lemma_query}'=='{lemma_doc}'")
 
                     return True  
 
     return False  # No match found
 
-def extract_simple_tokens(query):
+def extract_simple_tokens(query): # ['pestel', 'analysis']
     """Extracts only meaningful single-word tokens from a query (excluding stopwords & phrases)."""
     doc = nlp(query.lower())  # Process query with NLP model
     keywords = []
@@ -126,7 +171,7 @@ for doc_text in bm25_documents:
     VALID_SIMPLE_WORDS.update(extract_simple_tokens(doc_text))
 VALID_WORDS = set()
 for doc_text in bm25_documents:
-    VALID_WORDS.update(extract_complex_tokens(doc_text))
+    VALID_WORDS.update(extract_complex_tokens(doc_text, False))
 
 
 def group_pages_by_pdf(document_entries):
@@ -205,14 +250,14 @@ def treat_raw_query(query):
             updated_query_tokens.append(token)
     print(f"    ✅ Corrected Tokens After Spell Check: {updated_query_tokens}")
  
-    query = " ".join(updated_query_tokens)
-    print(f"📍 Treated query: {query}")
+    corrected_query = " ".join(updated_query_tokens)
+    print(f"📍 Treated query: {corrected_query}")
     
-    return query
+    return corrected_query
 
 # === SPELL CORRECTION === #
 
-def correct_spelling(word, set=VALID_SIMPLE_WORDS):
+def correct_spelling(word, set=VALID_SIMPLE_WORDS): # TODO: check if no need to use VALID_WORDS !?
     """Corrects spelling by finding the closest valid match."""
     closest_match = get_close_matches(word, set, n=1, cutoff=0.8)  # 80% similarity threshold
     if closest_match:

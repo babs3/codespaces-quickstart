@@ -18,6 +18,11 @@ slots:
     type: text
     mappings:
       - type: from_llm
+      
+  materials_location:
+    type: list
+    mappings:
+      - type: custom
 
 responses:
   utter_chitchat/ask_name:

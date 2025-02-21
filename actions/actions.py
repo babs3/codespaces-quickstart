@@ -12,6 +12,7 @@ import google.generativeai as genai
 from rasa_sdk import Action
 from sentence_transformers import SentenceTransformer
 import os
+from rasa_sdk.events import SlotSet, FollowupAction
 
 from .utils import *
 
@@ -51,13 +52,13 @@ class ActionFetchClassMaterial(Action):
         #query_tokens = tokenize(query)
         print(f"\n🔛 Getting BM25 sparse vectors...")
 
-        query_tokens = extract_simple_tokens(query)  # Extract meaningful keywords
+        query_tokens = extract_key_expressions(query)  # Extract meaningful keywords
         print(f"    📖 Query tokens: {query_tokens}")
 
-        expanded_tokens = expand_query_with_synonyms(query_tokens)  # Expand with synonyms
-        print(f"    🔄 Expanded keywords with synonyms: {expanded_tokens}")
-        print(f"    📍 Getting bm25_scores for tokens: {expanded_tokens}")
+        expanded_tokens = expand_query_with_weighted_synonyms(query_tokens)  # Expand with synonyms
+        print(f"    🔄 Expanded keywords with weighted synonyms: {expanded_tokens}")
 
+        print(f"    📍 Getting bm25_scores for tokens: {expanded_tokens}")
         bm25_scores = bm25_index.get_scores(expanded_tokens)
         top_bm25_indices = np.argsort(bm25_scores)[::-1][:20]  # Top 20 results
 
@@ -102,11 +103,17 @@ class ActionFetchClassMaterial(Action):
             print("\n🚨 No relevant materials found!")
         else: 
             print("\n✅ Selected Pages After Filtering:")
+            document_entries = []
             idx = 1
             for doc, meta, score in selected_results:
+                document_entries.append((meta['file'], meta['page']))
                 print(f"{idx}. 📄 PDF: {meta['file']} | Page: {meta['page']} | Score: {score:.4f}")
                 idx += 1
-
+            
+            # **Sort by PDF name (A-Z) and then by page number (ascending)**
+            document_entries.sort(key=lambda x: (x[0].lower(), x[1]))
+            gemini_results = group_pages_by_pdf(document_entries)
+            
             # Format results
             results_text = []
             for text_chunk, meta, score in selected_results:
@@ -119,7 +126,7 @@ class ActionFetchClassMaterial(Action):
             prompt = f"Use the following raw educational content to answer the student query: '{query}'. Make the provided content more readable to the student: \n{raw_text} "
 
             print("\n📢 Sending to Gemini API for Summarization...")
-            print(f"🔹 Prompt: {prompt[:300]}...")  # Show only first 300 chars for readability
+            print(f"🔹 Prompt: {prompt[:200]}...")  # Show only first 200 chars for readability
 
             try:
                 g_model = genai.GenerativeModel("gemini-pro")
@@ -136,9 +143,12 @@ class ActionFetchClassMaterial(Action):
                 print(f"\n❌ Error calling Gemini API: {e}")
 
             # Call the new action for material location
-            ActionGetClassMaterialLocation().run(dispatcher, tracker, domain)
+            #ActionGetClassMaterialLocation().run(dispatcher, tracker, domain)
 
-        return []
+        return  [
+                SlotSet("materials_location", gemini_results),  # Store selected materials
+                FollowupAction("action_get_class_material_location")  # Call the next action
+                ]
 
 
 # === ACTION 2: GET PDF NAMES & PAGE LOCATIONS === #
@@ -148,19 +158,21 @@ class ActionGetClassMaterialLocation(Action):
 
     def run(self, dispatcher, tracker, domain):
 
+        selected_materials = tracker.get_slot("materials_location")
+
         print(f"\n\n 🔖 --------- Getting class materials location --------- 🔖 ")
-        query = treat_raw_query(tracker.latest_message.get("text"))
+        corrected_query = treat_raw_query(tracker.latest_message.get("text"))
 
         # === Perform BM25 search with simple tokens === #
         # Step 1: Extract both complex & simple tokens
-        complex_tokens = extract_complex_tokens(query)  # e.g., ["pestel analysis"]
-        simple_tokens = extract_simple_tokens(query)  # e.g., ["pestel", "analysis"]
+        complex_tokens = extract_complex_tokens(corrected_query, True)  # e.g., ["pestel analysis"]
+        simple_tokens = extract_simple_tokens(corrected_query)  # e.g., ["pestel", "analysis"]
         print(f"\n📖 Finding material location for:\n - {complex_tokens}\n - {simple_tokens}")
 
-        # Step 3: Expand with synonyms
-        expanded_complex = expand_query_with_synonyms(complex_tokens)
-        expanded_simple = expand_query_with_synonyms(simple_tokens)
-        print(f"🔄 Expanded keywords with synonyms:\n - {expanded_complex}\n - {expanded_simple}")
+        # Step 3: Expand using **weighted synonyms** (prefer closer meanings)
+        expanded_complex = expand_query_with_weighted_synonyms(complex_tokens)
+        expanded_simple = expand_query_with_weighted_synonyms(simple_tokens)
+        print(f"🔄 Expanded tokens with synonyms:\n - {expanded_complex}\n - {expanded_simple}")
         
         # Step 4: Perform BM25 Search
         bm25_scores_complex = bm25_index.get_scores(expanded_complex)
@@ -181,7 +193,7 @@ class ActionGetClassMaterialLocation(Action):
             document_text = bm25_documents[i]
 
             # Tokenize the document text
-            document_tokens = extract_complex_tokens(document_text)
+            document_tokens = extract_complex_tokens(document_text, False)
 
             # Perform fuzzy matching -> solves matches like 'external environment analysis\npestel analysis'
             if fuzzy_match(expanded_complex, document_tokens):
@@ -195,6 +207,10 @@ class ActionGetClassMaterialLocation(Action):
         location_results = group_pages_by_pdf(document_entries)
 
         if location_results:
+
+            if len(document_entries) > len(selected_materials) * 3: # means that the tokenization went wrong
+                location_results = selected_materials
+
             print("\n🎯 Material location for query found!")
             print("\n📌 FINAL SORTED RESULTS:")
             for result in location_results:
