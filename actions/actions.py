@@ -39,7 +39,7 @@ class ActionFetchClassMaterial(Action):
         query = treat_raw_query(query)
 
         # === DENSE (Vector) SEARCH === #
-        print(f"\n🔛 Getting query embeddings for query: '{query}'")
+        print(f"\n🔛 Getting query embeddings for query: '{query}'\n...")
         
         query_embedding = model.encode(query, convert_to_numpy=True).tolist()
         vector_results = collection.query(query_embeddings=[query_embedding], n_results=20)
@@ -48,23 +48,32 @@ class ActionFetchClassMaterial(Action):
         vector_metadata = vector_results["metadatas"][0]
         vector_scores = vector_results["distances"][0]  # Lower is better (L2 distance)
 
-        # === SPARSE (BM25) SEARCH === #
-        #query_tokens = tokenize(query)
+
+        # === Perform Hyvrid BM25 search === #
         print(f"\n🔛 Getting BM25 sparse vectors...")
 
-        query_tokens = extract_key_expressions(query)  # Extract meaningful keywords
-        print(f"    📖 Query tokens: {query_tokens}")
+        # Step 1: Extract both complex & simple tokens
+        complex_tokens = extract_complex_tokens(query)  # e.g., ["pestel analysis"]
+        simple_tokens = extract_simple_tokens(query)  # e.g., ["pestel", "analysis"]
+        print(f"📖 Finding material location for:\n - {complex_tokens}\n - {simple_tokens}")
 
-        expanded_tokens = expand_query_with_weighted_synonyms(query_tokens)  # Expand with synonyms
-        print(f"    🔄 Expanded keywords with weighted synonyms: {expanded_tokens}")
+        # Step 3: Expand using **weighted synonyms** (prefer closer meanings)
+        expanded_complex = expand_query_with_weighted_synonyms(complex_tokens)
+        expanded_simple = expand_query_with_weighted_synonyms(simple_tokens)
+        print(f"🔄 Expanded tokens with synonyms:\n - {expanded_complex}\n - {expanded_simple}")
+        
+        # Step 4: Perform BM25 Search
+        bm25_scores_complex = bm25_index.get_scores(expanded_complex)
+        bm25_scores_simple = bm25_index.get_scores(expanded_simple)
 
-        print(f"    📍 Getting bm25_scores for tokens: {expanded_tokens}")
-        bm25_scores = bm25_index.get_scores(expanded_tokens)
-        top_bm25_indices = np.argsort(bm25_scores)[::-1][:20]  # Top 20 results
+        # Step 5: Combine Scores (Weighting Complex Matches Higher)
+        final_scores = 1.5 * bm25_scores_complex + 1.0 * bm25_scores_simple  # Give priority to complex matches
+        top_bm25_indices = np.argsort(final_scores)[::-1][:20]  # Top 20 results
 
         bm25_docs = [bm25_documents[i] for i in top_bm25_indices]
         bm25_metadata_selected = [bm25_metadata[i] for i in top_bm25_indices]
-        bm25_scores_selected = [bm25_scores[i] for i in top_bm25_indices]
+        bm25_scores_selected = [final_scores[i] for i in top_bm25_indices]
+
 
         # === NORMALIZE SCORES === #
         max_vec_score = max(vector_scores) if vector_scores else 1
@@ -168,7 +177,7 @@ class ActionGetClassMaterialLocation(Action):
         # Step 1: Extract both complex & simple tokens
         complex_tokens = extract_complex_tokens(query)  # e.g., ["pestel analysis"]
         simple_tokens = extract_simple_tokens(query)  # e.g., ["pestel", "analysis"]
-        print(f"\n📖 Finding material location for:\n - {complex_tokens}\n - {simple_tokens}")
+        print(f"📖 Finding material location for:\n - {complex_tokens}\n - {simple_tokens}")
 
         # Step 3: Expand using **weighted synonyms** (prefer closer meanings)
         expanded_complex = expand_query_with_weighted_synonyms(complex_tokens)

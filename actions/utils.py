@@ -19,14 +19,12 @@ def extract_complex_tokens(query): # ['pestel analysis']
     single_word_tokens = set()  # Store individual words temporarily
 
     # Extract noun phrases (multi-word terms)
-    print()
     for chunk in doc.noun_chunks:
         keyword = chunk.text.strip()
         if len(keyword.split()) > 1:  # Only keep multi-word phrases
             keywords.append(keyword)
             single_word_tokens.update(keyword.split())  # Store individual words to avoid later
 
-    print()
     # Extract single meaningful words (NOUN, PROPN) **if not part of a noun phrase**
     for token in doc:
         if token.pos_ in {"NOUN", "PROPN"} and not token.is_stop:
