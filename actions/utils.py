@@ -2,6 +2,7 @@ import spacy
 from fuzzywuzzy import fuzz
 import pickle
 from difflib import get_close_matches
+import re
 
 nlp = spacy.load("en_core_web_sm")
 
@@ -108,6 +109,20 @@ def expand_query_with_weighted_synonyms(query_expressions):
 
     return list(expanded_queries)
 
+import re
+
+def format_gemini_response(text: str) -> str:
+    """
+    Replace triple backticks (```) with ** for bold formatting.
+    
+    Args:
+        text (str): The response text from Gemini.
+    
+    Returns:
+        str: The formatted text with ** tags instead of triple backticks.
+    """
+    text = re.sub(r'```(.*?)```', r'**\1**', text, flags=re.DOTALL)
+    return text
 
 
 def lemmatize_word(word):

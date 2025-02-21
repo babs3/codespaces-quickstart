@@ -152,8 +152,9 @@ class ActionFetchClassMaterial(Action):
 
                 if hasattr(response, "text") and response.text:
                     print("\n🎯 Gemini Response Generated Successfully!")
-                    print(response.text)
-                    dispatcher.utter_message(text=response.text)
+                    formatted_response = format_gemini_response(response.text)
+                    print(formatted_response)
+                    dispatcher.utter_message(text=formatted_response)
                 else:
                     print("\n⚠️ Gemini Response is empty.")
                     dispatcher.utter_message(text="Sorry, I couldn't generate a response.")
