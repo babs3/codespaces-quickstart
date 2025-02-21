@@ -17,8 +17,8 @@ slots:
   user_query:
     type: text
     mappings:
-      - type: from_llm
-      
+      - type: custom
+
   materials_location:
     type: list
     mappings:

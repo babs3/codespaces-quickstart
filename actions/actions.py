@@ -146,9 +146,10 @@ class ActionFetchClassMaterial(Action):
             #ActionGetClassMaterialLocation().run(dispatcher, tracker, domain)
 
         return  [
-                SlotSet("materials_location", gemini_results),  # Store selected materials
-                FollowupAction("action_get_class_material_location")  # Call the next action
-                ]
+            SlotSet("user_query", query),  # Store the query
+            SlotSet("materials_location", gemini_results),  # Store selected materials
+            FollowupAction("action_get_class_material_location")  # Call the next action
+            ]
 
 
 # === ACTION 2: GET PDF NAMES & PAGE LOCATIONS === #
@@ -159,14 +160,14 @@ class ActionGetClassMaterialLocation(Action):
     def run(self, dispatcher, tracker, domain):
 
         selected_materials = tracker.get_slot("materials_location")
+        query = tracker.get_slot("user_query") # already treated in last function
 
         print(f"\n\n 🔖 --------- Getting class materials location --------- 🔖 ")
-        corrected_query = treat_raw_query(tracker.latest_message.get("text"))
 
-        # === Perform BM25 search with simple tokens === #
+        # === Perform Hyvrid BM25 search === #
         # Step 1: Extract both complex & simple tokens
-        complex_tokens = extract_complex_tokens(corrected_query, True)  # e.g., ["pestel analysis"]
-        simple_tokens = extract_simple_tokens(corrected_query)  # e.g., ["pestel", "analysis"]
+        complex_tokens = extract_complex_tokens(query)  # e.g., ["pestel analysis"]
+        simple_tokens = extract_simple_tokens(query)  # e.g., ["pestel", "analysis"]
         print(f"\n📖 Finding material location for:\n - {complex_tokens}\n - {simple_tokens}")
 
         # Step 3: Expand using **weighted synonyms** (prefer closer meanings)
@@ -193,7 +194,7 @@ class ActionGetClassMaterialLocation(Action):
             document_text = bm25_documents[i]
 
             # Tokenize the document text
-            document_tokens = extract_complex_tokens(document_text, False)
+            document_tokens = extract_complex_tokens(document_text)
 
             # Perform fuzzy matching -> solves matches like 'external environment analysis\npestel analysis'
             if fuzzy_match(expanded_complex, document_tokens):

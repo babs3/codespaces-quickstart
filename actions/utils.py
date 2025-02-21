@@ -12,19 +12,16 @@ with open("vector_store/bm25_index.pkl", "rb") as f:
 
 # === STEP 1: MULTI-WORD EXPRESSION (MWE) EXTRACTION === #
 
-def extract_complex_tokens(query, can_print): # ['pestel analysis']
+def extract_complex_tokens(query): # ['pestel analysis']
     """Extracts only meaningful subject keywords from a query."""
     doc = nlp(query.lower())  # Process query with NLP model
     keywords = []
     single_word_tokens = set()  # Store individual words temporarily
 
     # Extract noun phrases (multi-word terms)
-    #i = 0
     print()
     for chunk in doc.noun_chunks:
-        #i += 1
         keyword = chunk.text.strip()
-        if can_print: print(f"👻 keyword: {keyword}")
         if len(keyword.split()) > 1:  # Only keep multi-word phrases
             keywords.append(keyword)
             single_word_tokens.update(keyword.split())  # Store individual words to avoid later
@@ -32,7 +29,6 @@ def extract_complex_tokens(query, can_print): # ['pestel analysis']
     print()
     # Extract single meaningful words (NOUN, PROPN) **if not part of a noun phrase**
     for token in doc:
-        if can_print: print(f"    TOKENN: {token}")
         if token.pos_ in {"NOUN", "PROPN"} and not token.is_stop:
             if token.text not in single_word_tokens:  # Exclude if part of a noun phrase
                 keywords.append(token.text)
@@ -171,7 +167,7 @@ for doc_text in bm25_documents:
     VALID_SIMPLE_WORDS.update(extract_simple_tokens(doc_text))
 VALID_WORDS = set()
 for doc_text in bm25_documents:
-    VALID_WORDS.update(extract_complex_tokens(doc_text, False))
+    VALID_WORDS.update(extract_complex_tokens(doc_text))
 
 
 def group_pages_by_pdf(document_entries):
