@@ -120,27 +120,38 @@ def fuzzy_match(query_tokens, document_tokens, threshold=85):
     
     doc_text = " ".join(document_tokens).lower()  # Join doc tokens into full text
     query_tokens = [qt.lower() for qt in query_tokens]  # Lowercase query tokens
-    
+
     for query_token in query_tokens:
         lemma_query = lemmatize_word(query_token)  # Convert to base form
         
         if " " in query_token:  # If query token is a phrase (e.g., "pestel framework")
             if query_token in doc_text: # or lemma_query in doc_text:  # Check for phrase
-                print(f"\n💚 Match in query_token '{query_token}':\n{doc_text}")
+                print(f"\n  💚 Match in query_token '{query_token}':\n{doc_text}")
                 return True
         else:  # Single word matching
             for doc_token in document_tokens:
                 lemma_doc = lemmatize_word(doc_token)  # Lemmatize doc token
-                
                 # Allow exact match, lemmatized match, or fuzzy match
                 if (query_token == doc_token or  
                     lemma_query == lemma_doc or  
                     fuzz.token_set_ratio(query_token, doc_token) >= threshold):
-                    #print(f"\n📗 Match in query_token '{query_token}'=='{doc_token}' or lemma_query '{lemma_query}'=='{lemma_doc}'")
+                    print(f"\n  📗 Match in query_token '{query_token}'=='{doc_token}' or lemma_query '{lemma_query}'=='{lemma_doc}'")
 
                     return True  
 
     return False  # No match found
+
+from wordfreq import word_frequency
+
+def is_common_word(word, threshold=0.00001):
+    """
+    Check if a word is common based on its frequency in large corpora.
+    Lower threshold = more words classified as common.
+    """
+    freq = word_frequency(word, 'en')  # Get word frequency
+    return freq > threshold  # If frequency is high, it's a common word
+
+
 
 def extract_simple_tokens(query): # ['pestel', 'analysis']
     """Extracts only meaningful single-word tokens from a query (excluding stopwords & phrases)."""

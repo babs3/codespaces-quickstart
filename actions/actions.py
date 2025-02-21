@@ -61,10 +61,19 @@ class ActionFetchClassMaterial(Action):
         expanded_complex = expand_query_with_weighted_synonyms(complex_tokens)
         expanded_simple = expand_query_with_weighted_synonyms(simple_tokens)
         print(f"🔄 Expanded tokens with synonyms:\n - {expanded_complex}\n - {expanded_simple}")
+
+        specific_terms = [word for word in expanded_simple if not is_common_word(word)]
+        generic_terms = [word for word in expanded_simple if is_common_word(word)]
+
+        print(f"\n🔍 Specific terms: {specific_terms}")
+        print(f"📌 Generic terms: {generic_terms}")
+
+        print(f"    🔛 Getting BM25 sparse vectors for both:\n - {expanded_complex}\n - {specific_terms}")
         
+
         # Step 4: Perform BM25 Search
         bm25_scores_complex = bm25_index.get_scores(expanded_complex)
-        bm25_scores_simple = bm25_index.get_scores(expanded_simple)
+        bm25_scores_simple = bm25_index.get_scores(specific_terms)
 
         # Step 5: Combine Scores (Weighting Complex Matches Higher)
         final_scores = 1.5 * bm25_scores_complex + 1.0 * bm25_scores_simple  # Give priority to complex matches
@@ -135,7 +144,7 @@ class ActionFetchClassMaterial(Action):
             prompt = f"Use the following raw educational content to answer the student query: '{query}'. Make the provided content more readable to the student: \n{raw_text} "
 
             print("\n📢 Sending to Gemini API for Summarization...")
-            print(f"🔹 Prompt: {prompt[:200]}...")  # Show only first 200 chars for readability
+            print(f"🔹 Prompt: {prompt[:200]}\n")  # Show only first 200 chars for readability
 
             try:
                 g_model = genai.GenerativeModel("gemini-pro")
@@ -143,6 +152,7 @@ class ActionFetchClassMaterial(Action):
 
                 if hasattr(response, "text") and response.text:
                     print("\n🎯 Gemini Response Generated Successfully!")
+                    print(response.text)
                     dispatcher.utter_message(text=response.text)
                 else:
                     print("\n⚠️ Gemini Response is empty.")
@@ -177,7 +187,7 @@ class ActionGetClassMaterialLocation(Action):
         # Step 1: Extract both complex & simple tokens
         complex_tokens = extract_complex_tokens(query)  # e.g., ["pestel analysis"]
         simple_tokens = extract_simple_tokens(query)  # e.g., ["pestel", "analysis"]
-        print(f"📖 Finding material location for:\n - {complex_tokens}\n - {simple_tokens}")
+        print(f"\n📖 Finding material location for:\n - {complex_tokens}\n - {simple_tokens}")
 
         # Step 3: Expand using **weighted synonyms** (prefer closer meanings)
         expanded_complex = expand_query_with_weighted_synonyms(complex_tokens)
@@ -192,6 +202,12 @@ class ActionGetClassMaterialLocation(Action):
         final_scores = 1.5 * bm25_scores_complex + 1.0 * bm25_scores_simple  # Give priority to complex matches
 
         top_indices = np.argsort(final_scores)[::-1][:10]  # Top 10 results
+
+        specific_terms = [word for word in expanded_simple if not is_common_word(word)]
+        generic_terms = [word for word in expanded_simple if is_common_word(word)]
+
+        print(f"\n🔍 Specific terms: {specific_terms}")
+        print(f"📌 Generic terms: {generic_terms}")
     
 
         location_results = []
@@ -208,6 +224,23 @@ class ActionGetClassMaterialLocation(Action):
             # Perform fuzzy matching -> solves matches like 'external environment analysis\npestel analysis'
             if fuzzy_match(expanded_complex, document_tokens):
                 document_entries.append((file_name, page_number))
+        
+        if len(document_entries) == 0:
+            print("\n👻 --> No matching for Complex Tokens")
+            for i in top_indices:
+                file_name = bm25_metadata[i]["file"]
+                page_number = bm25_metadata[i]["page"]
+                document_text = bm25_documents[i]
+
+                # Tokenize the document text
+                simple_document_tokens = extract_simple_tokens(document_text)
+
+                # ✅ Ensure at least one "specific" word is found before allowing generic matches
+                contains_specific = any(fuzzy_match([word], simple_document_tokens) for word in specific_terms)
+                contains_generic = any(fuzzy_match([word], simple_document_tokens) for word in generic_terms)
+
+                if contains_specific or (contains_generic and len(specific_terms) == 0):
+                    document_entries.append((file_name, page_number))
 
 
         # **Sort by PDF name (A-Z) and then by page number (ascending)**
